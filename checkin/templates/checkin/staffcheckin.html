@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block aircraft %}
+    <div div class="container mt-4 content-section">
+    <center>
+        <h2>Check in</h2>
+    </center>
+    <hr>
+    <p><button class="btn btn-success form-control" onClick="camCheck(999)">Cam check TODO</button>
+    <h2>Pre-checked in</h2>
+        <div class="border-top border-bottom pt-3 mb-3">
+            <table id="youthTable" class="table table-striped">
+                <tbody>
+                    {% for youth in youts %}
+                        {% if youth.pre_check %}
+                            <tr>
+                                <th>First</th>
+                                <th>Middle</th>
+                                <th colspan="3">Last</th>
+                            </tr>
+                            <tr id="youth-{{youth.id}}">
+                                <form id="updateYouth" action="">
+                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                    </td>
+                                    <td name="test" hidden>test</td>
+                                    <td align="center">
+                                        <div class="form-group">
+                                            {% if youth.is_checked_in %}
+                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                            {% else %}
+                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    <h2>Ready for check in</h2>
+        <div class="border-top border-bottom pt-3 mb-3">
+            <table id="youthTable" class="table table-striped">
+                <tbody>
+                    {% for youth in youts %}
+                        {% if not youth.pre_check and not youth.is_checked_in %}
+                            <tr>
+                                <th>First</th>
+                                <th>Middle</th>
+                                <th colspan="3">Last</th>
+                            </tr>
+                            <tr id="youth-{{youth.id}}">
+                                <form id="updateYouth" action="">
+                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                    </td>
+                                    <td name="test" hidden>test</td>
+                                    <td align="center">
+                                        <div class="form-group">
+                                            {% if youth.is_checked_in %}
+                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                            {% else %}
+                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h2>Checked in</h2>
+        <div class="border-top pt-3">
+            <table id="youthTable" class="table table-striped">
+                <tbody>
+                    {% for youth in youts %}
+                        {% if youth.is_checked_in %}
+                            <tr>
+                                <th>First</th>
+                                <th>Middle</th>
+                                <th colspan="3">Last</th>
+                            </tr>
+                            <tr id="youth-{{youth.id}}">
+                                <form id="updateYouth" action="">
+                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                    </td>
+                                    <td name="test" hidden>test</td>
+                                    <td align="center">
+                                        <div class="form-group">
+                                            {% if youth.is_checked_in %}
+                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                            {% else %}
+                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock aircraft %}
+
+{% block javascript %}
+<script>
+function checkinYouth(id) {
+    var cnInput;
+    //Use youth id to locate the row and grab the specific checkbox
+    if (id) {
+        tr_id = "#youth-" + id;
+        cnInput = $(tr_id).find("input[type=checkbox][name='is_checked_in']").is(":checked");
+    }
+
+    //If the function is called, reverse the flag
+    if (cnInput == true) {
+        cnInput = false;
+    }
+    else
+    {
+        cnInput = true;
+    }
+
+    var action = false;
+    var youthobj = {
+        'id': id,
+        'is_checked_in': cnInput
+        };
+    
+    if (id) {
+        $.ajax({
+            url: '{% url "ajax_call_staffCheck" %}',
+            data: youthobj,
+            dataType: 'json',
+            success: function (data) {
+                $('form#updateYouth').trigger("reset");
+            }
+        });
+    }
+}
+
+function camCheck(id) {
+    var youthobj = {
+        'id': id,
+        };
+    
+    if (id) {
+        $.ajax({
+            url: '{% url "ajax_call_camCheck" %}',
+            data: youthobj,
+            dataType: 'json',
+            success: function (data) {
+                $('form#updateYouth').trigger("reset");
+            }
+        });
+    }
+}
+
+</script>
+{% endblock javascript%}

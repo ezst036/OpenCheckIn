@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>Open Check In</title>
+    </head>
+
+{% load crispy_forms_tags %}
+
+    <body class="vh-100 text-center bg-secondary">
+        <div class="min-vh-100 d-flex align-items-center justify-content-center">
+            <div class="w-25 pt-4 pb-4 pl-3 pr-3 rounded bg-light shadow-lg">
+            <legend class="border-bottom">Please Log In</legend>
+
+                <div>
+                    <img src="{% static "loginimage.png" %}" height="200" width="220">
+                </div>
+
+                <div class="container mt-4">
+                    <form method="POST" class="form-group">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+
+                        <button type="submit" class="btn btn-info">Log In</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
