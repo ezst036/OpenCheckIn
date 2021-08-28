@@ -1,0 +1,134 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+        .parallax-window {
+            min-height: 500px;
+            background: transparent;
+        }
+        .floattext {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-shadow: 0 0 5px #000;
+        }
+
+        </style>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>Open Check In</title>
+    </head>
+
+    <body class="bg-light">
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample08" aria-controls="navbarsExample08" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample08">
+            <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            {% if preferences.open_registration %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="{% url 'login' %}">Login</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="{% url 'logout' %}">Logout</a>
+                </li>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown08" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span>Hello {{ user.username }}!</span></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown08">
+                    {% if user.is_superuser %}
+                        <a class="dropdown-item" href="/admin/">Administration</a>
+                    {% else %}
+                        <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <a class="dropdown-item" href="{% url 'check' %}">Sunday Check In</a>
+                    {% endif %}
+                    <a class="dropdown-item" href="#">Something here</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            </ul>
+        </div>
+        </nav>
+
+        <div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block aircraft %}
+
+            {% endblock aircraft %}
+        </div>
+
+        <footer class="navbar justify-content-sm-center mt-4 navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Bottom navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+                </ul>
+            </div>
+        </footer>
+
+        <script type="text/javascript" src="{% static "jquery-3.5.1.slim.min.js" %}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/parallax.js/1.4.2/parallax.min.js"></script>
+        <script type="text/javascript" src="{% static "popper-1.16.1.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "bootstrap.min.js" %}"></script>
+        {% block javascript %}
+        {% endblock javascript%}
+
+    </body>
+</html>

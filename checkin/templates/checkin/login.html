@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block aircraft %}
+
+<main class="bd-masthead" id="content" role="main">
+    <div class="container mt-4">
+        
+        <form method="POST" class="form-group">
+        <legend class="border-bottom">Log In</legend>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div>
+                <button type="submit" class="btn btn-info">Log In</button>
+                <small class="text-muted">
+                    &nbsp; Need an Account? <a href="{% url 'register' %}">Click Here</a>
+                </small>
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock %}
