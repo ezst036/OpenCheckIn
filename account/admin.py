@@ -1,5 +1,5 @@
 from django.contrib import admin
-from account.models import Account, Youth, Family, UIPrefs, CheckInQr
+from account.models import Account, Youth, Family, UIPrefs, CheckInQr, YouthCheckInLog
 from django.contrib.auth.admin import UserAdmin
 from datetime import datetime
 
@@ -67,3 +67,9 @@ class QrAdmin(admin.ModelAdmin):
     list_display = ('code', 'qr_code', 'creatorid', 'completed', 'createddate')
     
 admin.site.register(CheckInQr, QrAdmin)
+
+class CheckinLogAdmin(admin.ModelAdmin):
+    list_display = ('youth_first_name', 'youth_last_name', 'last_checkin', 'last_checkout', 'checked_in_by', 'youthid', 'checked_out_by')
+    readonly_fields = ('youth_first_name', 'youth_last_name', 'last_checkin', 'last_checkout', 'checked_in_by', 'youthid', 'checked_out_by')
+
+admin.site.register(YouthCheckInLog, CheckinLogAdmin)

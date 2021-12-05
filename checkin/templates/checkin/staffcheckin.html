@@ -2,31 +2,81 @@
 
 {% block aircraft %}
     <div div class="container mt-4 content-section">
+    <div class="float-right">
+        <button class="btn btn-success form-control" onClick="camCheck()">Scan code</button>
+    </div>
     <center>
-        <h2>Check in</h2>
+        <h2> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Check in</h2>
     </center>
     <hr>
-    <p><button class="btn btn-success form-control" onClick="camCheck(999)">Cam check TODO</button>
-    <h2>Pre-checked in</h2>
+
+    <!-- Bootstrap modal -->
+    <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                </div>
+                <div class="modal-body" id="imgName">
+                    <img class="modal-content" src="" id="showImg" style="width: 400px; height: 264px;" >
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap code scan modal -->
+    <div class="modal fade" id="checkinModal" tabindex="-1" role="dialog" aria-labelledby="youthModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="youthModalLabel">Code scanned</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <form id="updateYouth" action="">
+                    <div class="modal-body" id="checkinmodalid">
+                        <table id="checkinTable" class="table">
+                            <tbody>
+                                <!-- Javascript insert data here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onClick="multiCheckin()">Save changes</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <h3>Pre-checked in</h3>
         <div class="border-top border-bottom pt-3 mb-3">
             <table id="youthTable" class="table table-striped">
                 <tbody>
                     {% for youth in youts %}
                         {% if youth.pre_check %}
                             <tr>
+                                <th></th>
                                 <th>First</th>
                                 <th>Middle</th>
                                 <th colspan="3">Last</th>
                             </tr>
-                            <tr id="youth-{{youth.id}}">
+                            <tr id="youth-{{youth.id}}" name="scanyouthitem">
                                 <form id="updateYouth" action="">
+                                    <td class="youthim youthData" name="youth_img">
+                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                        </a>
+                                    </td>
                                     <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
                                     <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
                                     <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
                                     <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
                                         <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
                                     </td>
-                                    <td name="test" hidden>test</td>
                                     <td align="center">
                                         <div class="form-group">
                                             {% if youth.is_checked_in %}
@@ -43,19 +93,26 @@
                 </tbody>
             </table>
         </div>
-    <h2>Ready for check in</h2>
+    
+    <h3>Ready for check in</h3>
         <div class="border-top border-bottom pt-3 mb-3">
             <table id="youthTable" class="table table-striped">
                 <tbody>
                     {% for youth in youts %}
                         {% if not youth.pre_check and not youth.is_checked_in %}
                             <tr>
+                                <th></th>
                                 <th>First</th>
                                 <th>Middle</th>
-                                <th colspan="3">Last</th>
+                                <th colspan="9">Last</th>
                             </tr>
                             <tr id="youth-{{youth.id}}">
                                 <form id="updateYouth" action="">
+                                    <td class="youthim youthData" name="youth_img">
+                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                        </a>
+                                    </td>
                                     <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
                                     <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
                                     <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
@@ -79,19 +136,26 @@
                 </tbody>
             </table>
         </div>
-        <h2>Checked in</h2>
+    
+    <h3>Checked in</h3>
         <div class="border-top pt-3">
             <table id="youthTable" class="table table-striped">
                 <tbody>
                     {% for youth in youts %}
                         {% if youth.is_checked_in %}
                             <tr>
+                                <th></th>
                                 <th>First</th>
                                 <th>Middle</th>
                                 <th colspan="3">Last</th>
                             </tr>
                             <tr id="youth-{{youth.id}}">
                                 <form id="updateYouth" action="">
+                                    <td class="youthim youthData" name="youth_img">
+                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                        </a>
+                                    </td>
                                     <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
                                     <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
                                     <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
@@ -120,7 +184,26 @@
 
 {% block javascript %}
 <script>
+
+    //Modal popups for youth
+    let modal = document.getElementById("imagemodal");
+    let img = document.getElementsByClassName("myImg");
+    let modalImg = document.getElementById("showImg");
+    let modalName = document.getElementById("imgName");
+
+    for (i = 0; i < img.length; i++) {
+        img[i].onclick = function () {
+            modal.style.display = "block";
+            modalImg.src = this.src;
+        }
+    }
+
+//Staff check in without using scanner
 function checkinYouth(id) {
+    var youthobj = {};
+    var youths = [];
+    youthobj.youths = youths;
+
     var cnInput;
     //Use youth id to locate the row and grab the specific checkbox
     if (id) {
@@ -138,38 +221,94 @@ function checkinYouth(id) {
     }
 
     var action = false;
-    var youthobj = {
+    var obj = {
         'id': id,
         'is_checked_in': cnInput
         };
     
+    youthobj.youths.push(obj);
+
+    console.log("hello");
+    console.log(youthobj);
+    
     if (id) {
         $.ajax({
+            type: "GET",
             url: '{% url "ajax_call_staffCheck" %}',
-            data: youthobj,
+            data: JSON.stringify(youthobj),
             dataType: 'json',
             success: function (data) {
-                $('form#updateYouth').trigger("reset");
+                //$('form#updateYouth').trigger("reset");
             }
         });
     }
 }
 
-function camCheck(id) {
-    var youthobj = {
-        'id': id,
-        };
-    
-    if (id) {
-        $.ajax({
-            url: '{% url "ajax_call_camCheck" %}',
-            data: youthobj,
-            dataType: 'json',
-            success: function (data) {
-                $('form#updateYouth').trigger("reset");
+function camCheck() {
+    $.ajax({
+        url: '{% url "ajax_call_camCheck" %}',
+        dataType: 'json',
+        success: function (data) {
+            for (const youtitem of data.youth) {
+                appendToCheckInTable(youtitem);
             }
-        });
+
+            let checkinmodal = document.getElementById("checkinModal");
+            checkinmodal.style.display = "block";
+            $('#checkinModal').modal('show')
+        }
+    });
+}
+
+function appendToCheckInTable(youth) {
+    $("#checkinTable > tbody:last-child").append(`
+        <thead class="thead-light">
+            <tr>
+                <th ></th>
+                <th style="width: 200px">First</th>
+                <th style="width: 150px">Middle</th>
+                <th style="width: 230px">Last</th>
+            </tr>
+        </thead>
+        <tr id="youth-${youth.id}" name="scanyouthitem">
+            <td class="youthim youthData" name="youth_img">
+                <a href="#" data-toggle="modal" data-target="#imagemodal">
+                    <img class="modal-content" src="${youth.image}" id="showmodalImg" style="width: 150px; height: 224px;" >
+                </a>
+            </td>
+            <td class="youthfn" name="youth_first_name">${youth.youth_first_name}</td>
+            <td class="youthmn" name="youth_middle_name">${youth.youth_middle_name}</td>
+            <td class="youthln" name="youth_last_name">${youth.youth_last_name}</td>
+        </tr>`);
+}
+
+function multiCheckin() {
+    var youthobj = {};
+    var youths = []
+    youthobj.youths = youths;
+
+    let listitems = document.getElementsByName('scanyouthitem');
+    for(let i = 0;i < listitems.length; i++)
+    {
+        var splititems = listitems[i].id.split('-');
+
+        var obj = {
+        'id': splititems[1],
+        'is_checked_in': false
+        };
+        
+        youthobj.youths.push(obj);
     }
+
+    $.ajax({
+        type: "GET",
+        url: '{% url "ajax_call_staffCheck" %}',
+        data: JSON.stringify(youthobj),
+        dataType: 'json',
+        success: function (data) {
+            $('form#updateYouth').trigger("reset");
+        }
+    });
 }
 
 </script>

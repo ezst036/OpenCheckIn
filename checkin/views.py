@@ -2,16 +2,18 @@ from django.shortcuts import render, redirect
 from account.models import Account, Family, Youth, UIPrefs, YouthCheckInLog, CheckInQr
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from account.forms import RegistrationForm, ProfileUpdateForm
+from account.forms import RegistrationForm, ProfileUpdateForm, UploadForm
 from django.contrib import messages
 from django.views.generic import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.utils.timezone import now
 import cv2
 from pyzbar.pyzbar import decode
 import time
 import warnings
+from urllib.parse import unquote_plus
+import json
 
 def login(request):
     if request.method == 'POST':
@@ -95,15 +97,18 @@ def profile(request):
 
 #Ajax
 class ProfileCreateYouth(View):
-    def get(self, request):
-        youthfn = request.GET.get('youth_first_name', None)
-        youthmn = request.GET.get('youth_middle_name', None)
-        youthln = request.GET.get('youth_last_name', None)
+    def post(self, request):
+        form = UploadForm(request.POST or None, request.FILES or None)
+        youthfn = request.POST.get('youth_first_name', None)
+        youthmn = request.POST.get('youth_middle_name', None)
+        youthln = request.POST.get('youth_last_name', None)
+        youthimg = request.FILES['image']
 
         obj = Youth.objects.create(
             youth_first_name = youthfn,
             youth_middle_name = youthmn,
-            youth_last_name = youthln 
+            youth_last_name = youthln,
+            image = youthimg
         )
 
         #Register new youth in the Family table
@@ -118,6 +123,7 @@ class ProfileCreateYouth(View):
             'youth_first_name':obj.youth_first_name,
             'youth_middle_name':obj.youth_middle_name,
             'youth_last_name':obj.youth_last_name,
+            'image':obj.image.url
         }
 
         data = {
@@ -211,64 +217,93 @@ class createQR(View):
 #Ajax
 class StaffCheckInYouth(View):
     def get(self, request):
-        id1 = request.GET.get('id', None)
-        youthcn = request.GET.get('is_checked_in', None).capitalize()
+        sentjson = unquote_plus(request.META['QUERY_STRING'])
+        data = json.loads(sentjson)
 
-        obj = Youth.objects.get(id=id1)
-        obj.is_checked_in = youthcn
+        for yout in data['youths']:
+            print(yout['id'])
+            print(yout['is_checked_in'])
 
-        maxtimestamp = YouthCheckInLog.objects.filter(youthid=id1).values_list('last_checkin', flat=True).order_by('-last_checkin').first()
-        youthidmatch = YouthCheckInLog.objects.filter(youthid=id1).values_list('id', flat=True).order_by('-last_checkin').first()
+            #Begin original methods here
+            #id1 = request.GET.get('id', None)
+            #youthcn = request.GET.get('is_checked_in', None).capitalize()
 
-        #If checking in functions
-        if youthcn == 'True':
-            obj.last_checkin = now()
+            obj = Youth.objects.get(id=yout['id'])
+            obj.is_checked_in = yout['is_checked_in']
 
-            newlogobj = YouthCheckInLog.objects.create(
-                youth_first_name = obj.youth_first_name,
-                youth_last_name = obj.youth_last_name,
-                youthid = id1,
-                checked_in_by = request.user.id,
-                last_checkin = now()
-            )
-        else: #checking out
-            obj.last_checkout = now()
+            maxtimestamp = YouthCheckInLog.objects.filter(youthid=yout['id']).values_list('last_checkin', flat=True).order_by('-last_checkin').first()
+            youthidmatch = YouthCheckInLog.objects.filter(youthid=yout['id']).values_list('id', flat=True).order_by('-last_checkin').first()
 
-            updlogobj = YouthCheckInLog.objects.get(id=youthidmatch)
-            updlogobj.checked_out_by = request.user.id
-            updlogobj.last_checkout = now()
-            updlogobj.save()
+            #If checking in functions
+            if obj.is_checked_in == True:
+                obj.last_checkin = now()
+                obj.pre_check = 0
 
-        obj.save()
+                newlogobj = YouthCheckInLog.objects.create(
+                    youth_first_name = obj.youth_first_name,
+                    youth_last_name = obj.youth_last_name,
+                    youthid = yout['id'],
+                    checked_in_by = request.user.id,
+                    last_checkin = now()
+                )
+            else: #checking out
+                obj.last_checkout = now()
+                obj.pre_check = 0
 
-        youth = {
-            'id':obj.id,
-            'is_checked_in':obj.is_checked_in
-        }
+                updlogobj = YouthCheckInLog.objects.get(id=youthidmatch)
+                updlogobj.checked_out_by = request.user.id
+                updlogobj.last_checkout = now()
+                updlogobj.save()
 
-        data = {
-            'youth': youth
-        }
-        return JsonResponse(data)
+            #Checkin complete, save record to database
+            obj.save()
+
+        responsedata = {}
+        return JsonResponse(responsedata)
 
 #Ajax
 class CamCheck(View):
     def get(self, request):
-        id1 = request.GET.get('id', None)
-
         scanresult = camControl()
         scanresulttype = scanresult[1]
         scanresultdecode = str(scanresult[0])
         resultsubstring = scanresultdecode[2:-1]
         
-        obj = CheckInQr.objects.get(code=resultsubstring)
-        obj.completed = True
-        obj.save()
+        #Only pull single object where completed = 0
+        qrobj = CheckInQr.objects.get(code=resultsubstring, completed=0)
 
-        youth = {
-            'id':999,
-            'is_checked_in':True
-        }
+        qrcodearray = qrobj.code.split('-')
+
+        qrcreateddate = qrcodearray[0]
+        qruserid = qrcodearray[1]
+
+        #remove userid and date so that only youth items remain
+        #remove parent first, remove date second.
+        del qrcodearray[1]
+        del qrcodearray[0]
+
+        multiqrobjs = Youth.objects.filter(id__in=(qrcodearray))
+        qrobj = CheckInQr.objects.filter(code=qrobj.code).latest('createddate')
+
+        qrobj.completed = True
+
+        #Auto save function after camera scan, save to db
+        qrobj.save()
+        
+        #Empty youth list object.  For loop will add JSON objects as necessary
+        youth = []
+
+        for yout in multiqrobjs:
+            youth.append(
+                {
+                    'id':yout.id,
+                    'youth_first_name':yout.youth_first_name,
+                    'youth_middle_name':yout.youth_middle_name,
+                    'youth_last_name':yout.youth_last_name,
+                    'image':yout.image.url,
+                    'is_checked_in':yout.is_checked_in
+                }
+            )
 
         data = {
             'youth': youth
@@ -307,6 +342,8 @@ def camControl():
     camera = True
     while camera == True:
         success, frame = cap.read()
+
+        print(frame)
 
         scans = decode(frame)
 

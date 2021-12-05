@@ -23,3 +23,8 @@ class ProfileUpdateForm(forms.ModelForm):
         model = Account
         fields = ['email', 'username', 'first_name', 'middle_name', 'last_name', 'phone_number', 'is_parent', 'profileimage', 'image']
         required_fields = fields
+
+class UploadForm(forms.ModelForm):
+    class Meta:
+        model = Youth
+        fields = ("youth_first_name", "youth_middle_name", "youth_last_name", "image")

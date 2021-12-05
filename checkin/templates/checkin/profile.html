@@ -38,6 +38,23 @@
 
             </div>
 
+            <!-- Bootstrap modal -->
+            <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        </div>
+                        <div class="modal-body" id="imgName">
+                            <img class="modal-content" src="" id="showImg" style="width: 400px; height: 264px;" >
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Right side -->
             <div class="col-md-6 col-md-pull-6">
                 <div class="col-md-10">
@@ -45,21 +62,21 @@
                         <h3>Sidebar</h3>
                         <p class='text-muted'>Parent information.
                             <ul class="list-group">
-                                <li class="list-group-item list-group-item-light">Future Pastor Send Message</li>
-                                <li class="list-group-item list-group-item-light">Pastor Prayer Request</li>
-                                <li class="list-group-item list-group-item-light">Something future</li>
-                                <li class="list-group-item list-group-item-light">Something else future</li>
                                 <li class="list-group-item list-group-item-light">
                                     <h3>Add Youth</h3>
-                                    <form id="addYouth" action="">
+                                    <form id="addYouth" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
                                     <div class="form-group">
-                                        <input class="form-control" type="text" name="youth_first_name" placeholder="First name" required>
+                                        <input class="form-control" type="text" name="youth_first_name" id="youth_f_n_id" placeholder="First name" required>
                                     </div>
                                     <div class="form-group">
-                                        <input class="form-control" type="text" name="youth_middle_name" placeholder="Middle name" required>
+                                        <input class="form-control" type="text" name="youth_middle_name" id="youth_m_n_id" placeholder="Middle name" required>
                                     </div>
                                     <div class="form-group">
-                                        <input class="form-control" type="text" name="youth_last_name" min="10" max="100" placeholder="Last name" required>
+                                        <input class="form-control" type="text" name="youth_last_name" id="youth_l_n_id" min="10" max="100" placeholder="Last name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input class="form-control" type="file" name="youth_img" id="youth_img_id" required>
                                     </div>
                                     <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
                                     </form>
@@ -78,15 +95,18 @@
                                             {% if youth.id == family.youth_id %}
                                                 <thead class="thead-light">
                                                     <tr>
-                                                        <th>First</th>
-                                                        <th>Middle</th>
-                                                        <th colspan="3">Last</th>
+                                                        <th></th> <!-- First name -->
+                                                        <th>First</th> <!-- Middle name -->
+                                                        <th colspan="3"></th> <!-- Last name -->
                                                     </tr>
                                                 </thead>
                                                 <tr id="youth-{{youth.id}}">
+                                                    <td class="youthim youthData" name="youth_img">
+                                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                                        </a>
+                                                    </td>
                                                     <td class="youthfn youthData" name="youth_first_name">{{youth.youth_first_name}}</td>
-                                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
-                                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
 
                                                     <form id="precheckYouth" action="">
                                                         <td align="center">
@@ -94,9 +114,9 @@
                                                                 <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
 
                                                                 {% if youth.pre_check %}
-                                                                    <button class="btn btn-outline-success form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                                                    <button class="btn btn-outline-success form-control" onClick="checkinYouth({{youth.id}})">Checkout</button>
                                                                 {% else %}
-                                                                    <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                                                    <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Checkin</button>
                                                                 {% endif %}
                                                             </div>
                                                         </td>
@@ -104,7 +124,12 @@
                                                     
                                                     <td align="center">
                                                         <div class="form-group">
-                                                            <button class="btn btn-outline-info form-control" onClick="editYouth({{youth.id}})" data-toggle="modal" data-target="#youthModal")">EDIT</button>
+                                                            <button class="btn btn-outline-info form-control" onClick="editYouth('{{ youth.id }}',
+                                                                                                                                 '{{ youth.youth_first_name }}',
+                                                                                                                                 '{{ youth.youth_middle_name }}',
+                                                                                                                                 '{{ youth.youth_last_name }}',
+                                                                                                                                 '{{ youth.image }}')"
+                                                                                                                                 data-toggle="modal" data-target="#youthModal")">EDIT</button>
                                                         </div>
                                                     </td>
                                                     <td align="center">
@@ -142,6 +167,8 @@
                     <form id="updateYouth" action="">
                         <div class="modal-body">
                             <input class="form-control" id="form-youthid" type="hidden" name="formYouthId"/>
+                            <label for="youth_first_name">img</label>
+                            <input class="form-control" id="form-youthimg" type="text" name="formIMG"/>
                             <label for="youth_first_name">First name</label>
                             <input class="form-control" id="form-youthf" type="text" name="formYFN"/>
                             <label for="youth_middle_name">Middle name</label>
@@ -162,22 +189,43 @@
 {% block javascript %}
 <script>
 
+    //Modal popups for youth
+    let modal = document.getElementById("imagemodal");
+    let img = document.getElementsByClassName("myImg");
+    let modalImg = document.getElementById("showImg");
+    let modalName = document.getElementById("imgName");
+
+    for (i = 0; i < img.length; i++) {
+        img[i].onclick = function () {
+            modal.style.display = "block";
+            modalImg.src = this.src;
+            modalName = this.parentElement.getElementsByClassName('myImg')[0].innerHTML;
+        }
+    }
+
 // Create Youth
 $("form#addYouth").submit(function() {
+    const csrf = document.getElementsByName('csrfmiddlewaretoken');
     var fnInput = $('input[name="youth_first_name"]').val().trim();
     var mnInput = $('input[name="youth_middle_name"]').val().trim();
     var lnInput = $('input[name="youth_last_name"]').val().trim();
-    var youthobj = {
-      'youth_first_name': fnInput,
-      'youth_middle_name': mnInput,
-      'youth_last_name': lnInput
-    };
+    const input = document.getElementById('youth_img_id')
+    const img_data = input.files[0]
+    const fd = new FormData()
+    fd.append('csrfmiddlewaretoken', csrf[0].value)
+    fd.append('image', img_data)
+    fd.append('youth_first_name', fnInput)
+    fd.append('youth_middle_name', mnInput)
+    fd.append('youth_last_name', lnInput)
     if (fnInput && mnInput && lnInput) {
         // Create Ajax Call
         $.ajax({
             url: '{% url "ajax_call_createyouth" %}',
-            data: youthobj,
-            dataType: 'json',
+            type: "POST",
+            data: fd,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
             success: function (data) {
               appendToYouthTable(data.youth);
             },
@@ -193,19 +241,47 @@ $("form#addYouth").submit(function() {
 });
 
 function appendToYouthTable(youth) {
+  console.log(youth);
+  console.log(youth.image);
   $("#youthTable > tbody:last-child").append(`
     <tr>
-        <th>First</th>
-        <th>Middle</th>
-        <th colspan="3">Last</th>
+        <th></th> <!-- First name -->
+        <th>First</th> <!-- Middle name -->
+        <th colspan="3"></th> <!-- Last name -->
     </tr>
     <tr id="youth-${youth.id}">
+        <td class="youthim youthData" name="youth_img">
+            <a href="#" data-toggle="modal" data-target="#imagemodal">
+                <img class="myImg" height=30 width=30 src="${youth.image}">
+            </a>
+        </td>
+
         <td class="youthfn" name="youth_first_name">${youth.youth_first_name}</td>
-        <td class="youthmn" name="youth_middle_name">${youth.youth_middle_name}</td>
-        <td class="youthln" name="youth_last_name">${youth.youth_last_name}</td>
+
+        <form id="precheckYouth" action="">
+            <td align="center">
+                <div class="form-group">
+                    <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
+
+                    {% if youth.pre_check %}
+                        <button class="btn btn-outline-success form-control" onClick="checkinYouth({{youth.id}})">Checkout</button>
+                    {% else %}
+                        <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Checkin</button>
+                    {% endif %}
+                </div>
+            </td>
+        </form>
+
         <td align="center">
             <div class="form-group">
-                <button class="btn btn-outline-info form-control" onClick="editYouth({{youth.id}})" data-toggle="modal" data-target="#youthModal")">EDIT</button>
+                <!-- Button hidden for now.  Edit doesn't return data with a new button. -->
+                <button class="btn btn-outline-info form-control" onClick="editYouth('{{ youth.id }}',
+                                                                        '{{ youth.youth_first_name }}',
+                                                                        '{{ youth.youth_middle_name }}',
+                                                                        '{{ youth.youth_last_name }}',
+                                                                        '{{ youth.image }}')"
+                                                                        data-toggle="modal" style="display:none" data-target="#youthModal")">EDIT</button>
+                <button class="btn btn-outline-info form-control" data-toggle="modal" onClick="window.location.reload();">Refresh</button>
             </div>
         </td>
         <td align="center">
@@ -243,18 +319,17 @@ $("form#updateYouth").submit(function() {
     $('#youthModal').modal('hide');
     return false;
 });
-function editYouth(id) {
-  if (id) {
-    tr_id = "#youth-" + id;
-    name = $(tr_id).find(".youthfn").text();
-    address = $(tr_id).find(".youthmn").text();
-    age = $(tr_id).find(".youthlm").text();
-    $('#form-youthid').val(id);
-    $('#form-youthf').val(name);
-    $('#form-youthm').val(address);
-    $('#form-youthl').val(age);
-  }
+
+function editYouth(id, fn, mn, ln, img) {
+    if (id) {
+        $('#form-youthid').val(id);
+        $('#form-youthf').val(fn);
+        $('#form-youthm').val(mn);
+        $('#form-youthl').val(ln);
+        $('#form-youthimg').val(img);
+    }
 }
+
 function updateToYouthTabel(youth){
     $("#youthTable #youth-" + youth.id).children(".youthData").each(function() {
         var attr = $(this).attr("name");

@@ -98,6 +98,7 @@ class Youth(models.Model):
     pre_check = models.BooleanField(default=False)
     is_checked_in = models.BooleanField(default=False)
     famlink_guardian = models.ManyToManyField(Account, related_name='users_account', through='Family', verbose_name="Guardian")
+    image = models.ImageField(default='default.png', upload_to='profile_pics')
 
     def __str__(self):
         return self.youth_first_name + ' ' + self.youth_last_name
