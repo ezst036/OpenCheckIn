@@ -14,10 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '#*xxa+_9&!0=s)32sn3tn&p1#3(817-mhpi0%y2&j$whz#k%+g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #Use port 8000
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.12', '192.168.3.164']
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.19', '192.168.3.164']
 
 
 # Application definition
@@ -116,7 +116,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(os.path.normpath(BASE_DIR), "static"), )
+STATICFILES_DIRS = (os.path.join(os.path.normpath(BASE_DIR), "static/admin"), )
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
