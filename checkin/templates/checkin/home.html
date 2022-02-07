@@ -37,7 +37,7 @@
 
             <div class="container">
                 {% if preferences.map %}
-                    <div class="mb-3 mt-4">
+                    <div class="mb-3 mt-4 pb-4">
                         <iframe width="{{preferences.mapwidth}}" height="{{preferences.mapheight}}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
                             src="https://www.openstreetmap.org/export/embed.html?bbox={{preferences.longitude}}%2C{{preferences.latitude}}%2C{{preferences.lonzoom}}%2C{{preferences.latzoom}}&amp;layer=mapnik{% if preferences.enable_marker %}&amp;marker={{preferences.latmarker}}%2C{{preferences.lonmarker}}{% endif %}"
                             style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat={{preferences.latmarker}}&amp;mlon={{preferences.lonmarker}}#map=15/{{preferences.latmarker}}/{{preferences.lonmarker}}">View Larger Map</a></small>
