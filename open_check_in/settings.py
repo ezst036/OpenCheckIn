@@ -14,7 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '#*xxa+_9&!0=s)32sn3tn&p1#3(817-mhpi0%y2&j$whz#k%+g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+####################
+# Setting debug to false removes CSS styling from
+# Administration during development
+####################
+DEBUG = True
 
 #Use port 8000
 ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.19', '192.168.3.164']

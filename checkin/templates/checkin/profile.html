@@ -77,9 +77,9 @@
                                                 <input class="form-control" type="text" name="youth_last_name" id="youth_l_n_id" min="10" max="100" placeholder="Last name" required>
                                             </div>
                                             <div class="form-group">
-                                                <input class="form-control" type="file" name="youth_img" id="youth_img_id" required>
+                                                <input class="form-control" type="file" name="youth_img" id="youth_img_id" placeholder="Photo" required>
                                             </div>
-                                            <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+                                            <button class="btn btn-primary form-control" name="submitYouth" id="submitYouthBtn" type="submit">SUBMIT</button>
                                         </form>
                                     </li>
                                 </ul>
@@ -116,9 +116,9 @@
                                                                 <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
 
                                                                 {% if youth.pre_check %}
-                                                                    <button class="btn btn-outline-success form-control" onClick="checkinYouth({{youth.id}})">Checkout</button>
+                                                                    <button class="btn btn-outline-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkout</button>
                                                                 {% else %}
-                                                                    <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Checkin</button>
+                                                                    <button class="btn btn-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkin</button>
                                                                 {% endif %}
                                                             </div>
                                                         </td>
@@ -126,7 +126,7 @@
                                                     
                                                     <td align="center">
                                                         <div class="form-group">
-                                                            <button class="btn btn-outline-info form-control" onClick="editYouth('{{ youth.id }}',
+                                                            <button class="btn btn-outline-info form-control" id="editTblBtn-{{youth.id}}" onClick="editYouth('{{ youth.id }}',
                                                                                                                                  '{{ youth.youth_first_name }}',
                                                                                                                                  '{{ youth.youth_middle_name }}',
                                                                                                                                  '{{ youth.youth_last_name }}',
@@ -146,12 +146,14 @@
                             </table>
                             <div class="border-bottom mb-4"></div>
 
-                            <div class="qrcodediv" id="qrimg">
-                                {% if not obj.completed %}
-                                    <h3 class="text-muted">Checkout code</h3>
-                                    <img src={{obj.qr_code.url}}></div>
-                                {% else %} <!-- Do not show the button if the QR code is showing -->
-                                    <p><button class="btn btn-success form-control" onClick="createQR()">Create QR</button>
+                            <div class="qrcodediv pb-3" id="qrimg">
+                                {% if preferences == True %}
+                                    {% if not obj.completed %}
+                                        <h3 class="text-muted">Checkout code</h3>
+                                        <img src={{obj.qr_code.url}}></div>
+                                    {% else %} <!-- Do not show the button if the QR code is showing -->
+                                        <p><button class="btn btn-success form-control" onClick="createQR()">Create QR</button>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endif %}
@@ -171,18 +173,18 @@
                     <form id="updateYouth" action="">
                         <div class="modal-body">
                             <input class="form-control" id="form-youthid" type="hidden" name="formYouthId"/>
-                            <label for="youth_first_name">img</label>
-                            <input class="form-control" id="form-youthimg" type="text" name="formIMG"/>
                             <label for="youth_first_name">First name</label>
                             <input class="form-control" id="form-youthf" type="text" name="formYFN"/>
                             <label for="youth_middle_name">Middle name</label>
                             <input class="form-control" id="form-youthm" type="text" name="formYMN"/>
                             <label for="youth_last_name">Last name</label>
                             <input class="form-control" id="form-youthl" type="text" name="formYLN"/>
+                            <label for="youth_img">Photo</label>
+                            <input class="form-control" id="form-youthimg" type="file" name="formIMG"/>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary" >Save changes</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="editYouthBtn">Save changes</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onClick="closeDecorate()">Close</button>
                         </div>
                     </form>
                </div>
@@ -210,6 +212,11 @@
 // Create Youth
 $("form#addYouth").submit(function() {
     const csrf = document.getElementsByName('csrfmiddlewaretoken');
+    var btnName = document.getElementById("submitYouthBtn");
+    btnName.innerHTML = "Uploading....";
+    btnName.classList.remove("btn-primary");
+    btnName.classList.add("btn-outline-primary");
+    btnName.disabled = true;
     var fnInput = $('input[name="youth_first_name"]').val().trim();
     var mnInput = $('input[name="youth_middle_name"]').val().trim();
     var lnInput = $('input[name="youth_last_name"]').val().trim();
@@ -221,7 +228,9 @@ $("form#addYouth").submit(function() {
     fd.append('youth_first_name', fnInput)
     fd.append('youth_middle_name', mnInput)
     fd.append('youth_last_name', lnInput)
-    if (fnInput && mnInput && lnInput) {
+    var imgsize = img_data.size;
+    var imgsizelimit = 1024 * 1024 * 10;
+    if (imgsize < imgsizelimit) {
         // Create Ajax Call
         $.ajax({
             url: '{% url "ajax_call_createyouth" %}',
@@ -238,8 +247,12 @@ $("form#addYouth").submit(function() {
             }
         });
       } else {
-        alert("All fields must have a valid value.");
+        alert("Selected image cannot be larger than 10Mb.");
     }
+    btnName.innerHTML = "SUBMIT";
+    btnName.classList.remove("btn-outline-primary");
+    btnName.classList.add("btn-primary");
+    btnName.disabled = false;
     $('form#addUser').trigger("reset");
     return false;
 });
@@ -296,20 +309,32 @@ function appendToYouthTable(youth) {
 
 // Update Youth
 $("form#updateYouth").submit(function() {
+    const csrf = document.getElementsByName('csrfmiddlewaretoken');
     var idInput = $('input[name="formYouthId"]').val().trim();
     var fnInput = $('input[name="formYFN"]').val().trim();
     var mnInput = $('input[name="formYMN"]').val().trim();
     var lnInput = $('input[name="formYLN"]').val().trim();
-    if (fnInput && mnInput && lnInput) {
+    const input = document.getElementById('form-youthimg')
+    const img_data = input.files[0]
+    const fd = new FormData()
+    fd.append('csrfmiddlewaretoken', csrf[0].value)
+    fd.append('image', img_data)
+    fd.append('id', idInput)
+    fd.append('youth_first_name', fnInput)
+    fd.append('youth_middle_name', mnInput)
+    fd.append('youth_last_name', lnInput)
+    var btnName = document.getElementById('editTblBtn-' + idInput);
+    btnName.disabled = true;
+    var imgsize = img_data.size;
+    var imgsizelimit = 1024 * 1024 * 10;
+    if (imgsize < imgsizelimit) {
         $.ajax({
             url: '{% url "ajax_call_updateYouth" %}',
-            data: {
-                'id': idInput,
-                'youth_first_name': fnInput,
-                'youth_middle_name': mnInput,
-                'youth_last_name': lnInput
-            },
-            dataType: 'json',
+            type: "POST",
+            data: fd,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
             success: function (data) {
                 if (data.youth) {
                   updateToYouthTabel(data.youth);
@@ -317,21 +342,38 @@ $("form#updateYouth").submit(function() {
             }
         });
        } else {
-        alert("All fields must have a valid value.");
+        alert("Selected image cannot be larger than 10Mb.");
     }
-    $('form#updateYouth').trigger("reset");
+    //$('form#updateYouth').trigger("reset");
     $('#youthModal').modal('hide');
+    closeDecorate();
     return false;
 });
 
 function editYouth(id, fn, mn, ln, img) {
+    var btnName = document.getElementById('editTblBtn-' + id);
+    btnName.innerHTML = "Uploading....";
+    btnName.classList.remove("btn-outline-info");
+    btnName.classList.add("btn-secondary");
+    //btnName.disabled = true;
     if (id) {
         $('#form-youthid').val(id);
         $('#form-youthf').val(fn);
         $('#form-youthm').val(mn);
         $('#form-youthl').val(ln);
         $('#form-youthimg').val(img);
+        var idInput = $('input[name="formYouthId"]').val().trim();
+        console.log(idInput);
     }
+}
+
+function closeDecorate() {
+    var btnNmbr = document.getElementById('form-youthid').value;
+    var btnName = document.getElementById('editTblBtn-' + btnNmbr);
+    btnName.innerHTML = "EDIT";
+    btnName.classList.remove("btn-secondary");
+    btnName.classList.add("btn-outline-info");
+    btnName.disabled = false;
 }
 
 function updateToYouthTabel(youth){
@@ -341,8 +383,10 @@ function updateToYouthTabel(youth){
           $(this).text(youth.youth_first_name);
         } else if (attr == "youth_middle_name") {
           $(this).text(youth.youth_middle_name);
-        } else {
+        } else if (attr == "youth_last_name") {
           $(this).text(youth.youth_last_name);
+        } else if (attr == "youth_img") {
+          $(this).find('img').attr("src", youth.image);
         }
       });
 }

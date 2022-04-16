@@ -72,6 +72,12 @@ def profile(request):
         p_form = ProfileUpdateForm(instance=request.user)
         fams = Family.objects.all()
         youts = Youth.objects.all()
+        try:
+            preferred = UIPrefs.objects.all()[0]
+        except IndexError:
+            preferred = {
+                'enable_qr': True
+            }   
 
         obj = None
 
@@ -91,7 +97,8 @@ def profile(request):
         'obj' : obj,
         'p_form': p_form,
         'fams': fams,
-        'youts': youts
+        'youts': youts,
+        'preferences': preferred.enable_qr
     }
     return render(request, 'checkin/profile.html', context)
 
@@ -133,25 +140,43 @@ class ProfileCreateYouth(View):
 
 #Ajax
 class ProfileUpdateYouth(View):
-    def get(self, request):
-        id1 = request.GET.get('id', None)
-        youthfn = request.GET.get('youth_first_name', None)
-        youthmn = request.GET.get('youth_middle_name', None)
-        youthln = request.GET.get('youth_last_name', None)
-
-        obj = Youth.objects.get(id=id1)
-        obj.youth_first_name = youthfn
-        obj.youth_middle_name = youthmn
-        obj.youth_last_name = youthln
+    def post(self, request):
+        form = UploadForm(request.POST or None, request.FILES or None)
+        youthid = request.POST.get('id', None)
+        youthfn = request.POST.get('youth_first_name', None)
+        youthmn = request.POST.get('youth_middle_name', None)
+        youthln = request.POST.get('youth_last_name', None)
+        boolimgupl = True
+        
+        obj = Youth.objects.get(id=youthid)
+        
+        #Handle null error for no uploaded file        
+        try:
+            youthimg = request.FILES['image']
+        except Exception as e:
+            boolimgupl = False
+            print(e)
+        
+        if boolimgupl == False:
+            obj.youth_first_name = youthfn
+            obj.youth_middle_name = youthmn
+            obj.youth_last_name = youthln
+        else:
+            obj.youth_first_name = youthfn
+            obj.youth_middle_name = youthmn
+            obj.youth_last_name = youthln
+            obj.image = youthimg
+                
         obj.save()
-
+                
         youth = {
             'id':obj.id,
             'youth_first_name':obj.youth_first_name,
             'youth_middle_name':obj.youth_middle_name,
-            'youth_last_name':obj.youth_last_name
+            'youth_last_name':obj.youth_last_name,
+            'image':obj.image.url
         }
-
+        
         data = {
             'youth': youth
         }

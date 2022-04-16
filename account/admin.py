@@ -65,6 +65,7 @@ admin.site.register(UIPrefs, PreferenceAdmin)
 
 class QrAdmin(admin.ModelAdmin):
     list_display = ('code', 'qr_code', 'creatorid', 'completed', 'createddate')
+    readonly_fields = ('code', 'qr_code', 'creatorid')
     
 admin.site.register(CheckInQr, QrAdmin)
 

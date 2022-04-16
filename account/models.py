@@ -126,6 +126,8 @@ class UIPrefs(models.Model):
     church_address_two = models.CharField(verbose_name="Church Address two", max_length=255, default="Optional lot number")
     open_registration = models.BooleanField(verbose_name="Open registration", default=True)
     intranet = models.BooleanField(verbose_name="Intranet login", default=True)
+    main_background = models.ImageField(default='crosses.jpg')
+    enable_qr = models.BooleanField(default=True)
     map = models.BooleanField(verbose_name="Enable map", default=True)
     latitude = models.CharField(verbose_name="Latitude", max_length=20, default="25.036289")
     longitude = models.CharField(verbose_name="Longitude", max_length=20, default="-77.481326")
@@ -136,6 +138,10 @@ class UIPrefs(models.Model):
     lonmarker = models.CharField(verbose_name="Longitude marker", max_length=20, default="-77.470222")
     mapheight = models.CharField(verbose_name="Map height", max_length=20, default="400")
     mapwidth = models.CharField(verbose_name="Map width", max_length=20, default="600")
+
+    class Meta:
+        verbose_name = "UI Preference"
+        verbose_name_plural = "Preferences"
 
 class CheckInQr(models.Model):
     code = models.CharField(max_length=200)

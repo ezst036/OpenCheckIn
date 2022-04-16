@@ -80,9 +80,9 @@
                                     <td align="center">
                                         <div class="form-group">
                                             {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                                <button class="btn btn-outline-info form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
                                             {% else %}
-                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                                <button class="btn btn-success form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -123,9 +123,9 @@
                                     <td align="center">
                                         <div class="form-group">
                                             {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                                <button class="btn btn-outline-info form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
                                             {% else %}
-                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                                <button class="btn btn-success form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
                                             {% endif %}
                                         </div>
                                     </td>
@@ -166,9 +166,9 @@
                                     <td align="center">
                                         <div class="form-group">
                                             {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                                <button class="btn btn-outline-info form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
                                             {% else %}
-                                                <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                                <button class="btn btn-success form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
                                             {% endif %}
                                         </div>
                                     </td>
