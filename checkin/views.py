@@ -35,6 +35,20 @@ def home_screen_view(request):
     
     return render(request, 'checkin/home.html', context)
 
+def test_view(request):
+    try:
+        preferred = UIPrefs.objects.all()[0]
+    except IndexError:
+        preferred = {
+            'church_name': 'Open Check In'
+        }
+
+    context = {
+        'preferences': preferred,
+    }
+    
+    return render(request, 'checkin/test.html', context)
+
 @login_required
 def staff_check_youths(request):
     youts = Youth.objects.all()

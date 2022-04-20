@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block aircraft %}
+
+<html>
+
+    <body>
+        <main class="bd-masthead" id="content" role="main">
+            <div class="container">
+                <div>
+                    <h5 class="mb-3 mt-4 text-dark">Open Check In is an open source system designed to streamline attendance for children's ministry and other educational events.</h5>
+                </div>
+            </div>
+
+                <div class="floattext parallax-window" data-parallax="scroll" data-image-src="/media/{{preferences.main_background}}">
+                    <h1 class="text-light display-3">Welcome to {{preferences.church_name}}</h1>
+                </div>
+            <div class="container">
+                <p class="mb-3 mt-4 text-dark">Capabilities:</p>
+                <ul class="list-group">
+                    <li class="ml-5 text-dark">Parent profiles</li>
+                    <li class="ml-5 text-dark">Staff check in</li>
+                    <li class="ml-5 text-dark">Intranet-capable</li>
+                    <li class="ml-5 text-dark">Customizeable with your theme</li>
+                    <li class="ml-5 text-dark">Map embed with Open Street Map</li>
+                    <li class="ml-5 text-dark">Works across your entire local network</li>
+                    <li class="ml-5 text-dark">Compatible with open source Kiosks such as Porteus Kiosk</li>
+                    <li class="ml-5 text-dark">Compatible with Android smart phones and tablets as well as Apple iPhone and iPad</li>
+                    <li class="ml-5 text-dark">Compatible with all major operating systems: Linux, Windows, MacOS, and FreeBSD</li>
+                </ul>
+                <p class="mb-3 mt-4 text-dark">Open Check In relies on many well-established and trusted open source initiatives: Python, Django, Bootstrap, Popper, Jquery, OpenCV, Pixelcog, Pixabay and more.</p>
+            </div>
+
+            <div class="floattext parallax-window" data-parallax="scroll" data-image-src="/media/crosses.jpg">
+                <h1 class="text-light">Home Theme</h1>
+            </div>
+
+            <div class="container">
+                {% if preferences.map %}
+                    <div class="mb-3 mt-4 pb-4">
+                        <iframe width="{{preferences.mapwidth}}" height="{{preferences.mapheight}}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox={{preferences.longitude}}%2C{{preferences.latitude}}%2C{{preferences.lonzoom}}%2C{{preferences.latzoom}}&amp;layer=mapnik{% if preferences.enable_marker %}&amp;marker={{preferences.latmarker}}%2C{{preferences.lonmarker}}{% endif %}"
+                            style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat={{preferences.latmarker}}&amp;mlon={{preferences.lonmarker}}#map=15/{{preferences.latmarker}}/{{preferences.lonmarker}}">View Larger Map</a></small>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </body>
+</html>
+
+{% endblock %}

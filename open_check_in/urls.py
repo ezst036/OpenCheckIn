@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^admin/logout/', views_from_checkin.logoff),
     path('admin/', admin.site.urls),
     path('', views_from_checkin.home_screen_view, name="home"),
+    path('test/', views_from_checkin.test_view, name="test"),
     path('checkyouth/', views_from_checkin.staff_check_youths, name="check"),
     path('register/', registration_view, name="register"),
     path('profile/', views_from_checkin.profile, name="profile"),
