@@ -1,19 +1,27 @@
 from django.shortcuts import render, redirect
 from account.models import Account, Family, Youth, UIPrefs, YouthCheckInLog, CheckInQr
+from checkout.models import ItemPurchaseLog
+from tithe.models import TitheLog
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from account.forms import RegistrationForm, ProfileUpdateForm, UploadForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView
 from django.contrib import messages
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.utils.timezone import now
-import cv2
+#import cv2
 from pyzbar.pyzbar import decode
-import time
+from datetime import time
 import warnings
 from urllib.parse import unquote_plus
 import json
+from event.models import Event, EventPurchaseLog
+from geopy.geocoders import Nominatim
+
+from django.urls import reverse_lazy
 
 def login(request):
     if request.method == 'POST':
@@ -22,6 +30,7 @@ def login(request):
     return render(request, 'checkin/login.html')
 
 def home_screen_view(request):
+
     try:
         preferred = UIPrefs.objects.all()[0]
     except IndexError:
@@ -87,9 +96,9 @@ def profile(request):
         fams = Family.objects.all()
         youts = Youth.objects.all()
         try:
-            preferred = UIPrefs.objects.all()[0]
+            preferences = UIPrefs.objects.all()[0]
         except IndexError:
-            preferred = {
+            preferences = {
                 'enable_qr': True
             }   
 
@@ -105,14 +114,46 @@ def profile(request):
                 'code':"newcode",
                 'qr_code':"",
                 'completed':"True"
-            }        
+            }
+        
+        tithelist = None
+        try:
+            tithelist = TitheLog.objects.filter(userAccountid=request.user.id)
+
+            #TODO: format the currency correctly
+        except Exception as e:
+            print(e) 
+        
+        if len(tithelist) > 1:
+            for tithe in tithelist:
+                tithe.giveAmount = tithe.giveAmount / 100
+
+        eventRegistrationList = None
+        try:
+            eventRegistrationList = EventPurchaseLog.objects.filter(userAccountid=request.user.id)
+        except Exception as e:
+            print(e)
+        
+        itemPurchaseList = None
+        try:
+            itemPurchaseList = ItemPurchaseLog.objects.filter(userAccountid=request.user.id)
+        except Exception as e:
+            print(e) 
+
+        event = Event.objects.filter(complete=False)
 
     context = {
         'obj' : obj,
         'p_form': p_form,
         'fams': fams,
         'youts': youts,
-        'preferences': preferred.enable_qr
+        'tithelog': tithelist,
+        'preferences': preferences,
+        'currlat': preferences.latitude,
+        'currlon': preferences.longitude,
+        'events': event,
+        'eventlog': eventRegistrationList,
+        'itempurchaselog': itemPurchaseList
     }
     return render(request, 'checkin/profile.html', context)
 
@@ -171,7 +212,8 @@ class ProfileUpdateYouth(View):
             boolimgupl = False
             print(e)
         
-        if boolimgupl == False:
+        #Check if the file uploaded is the mock blob file
+        if youthimg.content_type == 'plain/text' and youthimg.name == 'blob' or boolimgupl == False:
             obj.youth_first_name = youthfn
             obj.youth_middle_name = youthmn
             obj.youth_last_name = youthln
@@ -218,8 +260,10 @@ class createQR(View):
     def get(self, request):
         thetime = now()
         thedate = str(thetime.month).zfill(2) + str(thetime.day).zfill(2) + str(thetime.year).zfill(4)
-        familyids = Family.objects.filter(guardian_id=request.user.id).values_list('youth_id', flat=True)        
-        filtered = list(Youth.objects.filter(id__in=familyids).filter(pre_check=1).values_list('id', flat=True))
+        familyids = Family.objects.filter(guardian_id=request.user.id).values_list('youth_id', flat=True)
+
+        #Get all children who have been either checked in by a parent or by an employee
+        filtered = list(Youth.objects.filter(id__in=familyids).filter(pre_check=1, is_checked_in=1).values_list('id', flat=True))
         
         #Create a basic object to gracefully handle no code created.
         obj = {
@@ -303,13 +347,15 @@ class StaffCheckInYouth(View):
 #Ajax
 class CamCheck(View):
     def get(self, request):
-        scanresult = camControl()
-        scanresulttype = scanresult[1]
-        scanresultdecode = str(scanresult[0])
-        resultsubstring = scanresultdecode[2:-1]
+        ajaxDelivery = json.loads(request.GET['json_data'])
+        #scanresult = camControl()
+        #scanresulttype = scanresult[1]
+        #scanresultdecode = str(scanresult[0])
+        #resultsubstring = scanresultdecode[2:-1]
         
         #Only pull single object where completed = 0
-        qrobj = CheckInQr.objects.get(code=resultsubstring, completed=0)
+        #qrobj = CheckInQr.objects.get(code=resultsubstring, completed=0)
+        qrobj = CheckInQr.objects.get(code=ajaxDelivery['scannedData'], completed=0)
 
         qrcodearray = qrobj.code.split('-')
 
@@ -373,34 +419,69 @@ def camControl():
     warnings.filterwarnings("error")
 
     #TODO: Handle errors better if the camera is simply unplugged
-    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture(0)
     whatgotscanned = ''
 
-    cap.set(3, 640)
-    cap.set(4, 480)
-    camera = True
-    while camera == True:
-        success, frame = cap.read()
+    # cap.set(3, 640)
+    # cap.set(4, 480)
+    # camera = True
+    # while camera == True:
+    #     success, frame = cap.read()
 
-        print(frame)
+    #     print(frame)
 
-        scans = decode(frame)
+    #     scans = decode(frame)
 
-        if len(scans) == 1:
-            whatgotscanned = scans[0]
-            time.sleep(1)
-            camera = False
+    #     if len(scans) == 1:
+    #         whatgotscanned = scans[0]
+    #         time.sleep(1)
+    #         camera = False
 
-        #for code in decode(frame):
-            #print(code.type)
-            #print(code.data.decode('utf-8'))
-            #time.sleep(3)
+    #     #for code in decode(frame):
+    #         #print(code.type)
+    #         #print(code.data.decode('utf-8'))
+    #         #time.sleep(3)
         
-        cv2.imshow('open_check_in-qr-scan', frame)
-        if cv2.waitKey(1) == ord('q'):
-            break
+    #     cv2.imshow('open_check_in-qr-scan', frame)
+    #     if cv2.waitKey(1) == ord('q'):
+    #         break
 
-    cap.release()
-    cv2.destroyAllWindows()
+    # cap.release()
+    # cv2.destroyAllWindows()
 
     return whatgotscanned
+
+#Ajax
+class HomeLocation(View):
+    def post(self, request):
+        try:
+            preferred = UIPrefs.objects.all()[0]
+        except IndexError as e:
+            #return nothing if prefs do not exist.
+            print(e)
+            return JsonResponse({ 'updated': False })
+        
+        geolocator = Nominatim(user_agent="githubdotcomslashezst036, ezst036@gmx.com")
+        location = geolocator.geocode(request.POST.get('location', None))
+
+        if location.latitude == None or location.longitude == None:
+            messages.success(request, f'Nothing was found using this search term.')
+            return JsonResponse({ 'updated': False })
+        else:
+            #check for same values, if so do not send to database.
+            if location.latitude != preferred.latitude or location.longitude != preferred.longitude:
+                preferred.latitude = location.latitude
+                preferred.longitude = location.longitude
+                preferred.save()
+
+        # lat = request.POST.get('latitude', None)
+        # lon = request.POST.get('longitude', None)
+
+        return JsonResponse({ 'newlat': location.latitude, 'newlon': location.longitude })
+
+class PasswordChange(PasswordChangeView):
+    from_class = PasswordChangeForm
+    success_url = reverse_lazy('passwordchangecomplete')
+
+def passwordChangeComplete(request):
+    return render(request, 'checkin/passwordchangecomplete.html')

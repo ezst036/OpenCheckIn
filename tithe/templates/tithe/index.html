@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+	<style type="text/css">
+		/**
+		* The CSS shown here will not be introduced in the Quickstart guide, but shows
+		* how you can use CSS to style your Element's container.
+		*/
+		.StripeElement {
+		box-sizing: border-box;
+
+		height: 40px;
+
+		padding: 10px 12px;
+
+		border: 1px solid transparent;
+		border-radius: 4px;
+		background-color: white;
+
+		box-shadow: 0 1px 3px 0 #e6ebf1;
+		-webkit-transition: box-shadow 150ms ease;
+		transition: box-shadow 150ms ease;
+		}
+
+		.StripeElement--focus {
+		box-shadow: 0 1px 3px 0 #cfd7df;
+		}
+
+		.StripeElement--invalid {
+		border-color: #fa755a;
+		}
+
+		.StripeElement--webkit-autofill {
+		background-color: #fefde5 !important;
+		}
+	</style>
+	<script src="https://js.stripe.com/v3/"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<div div class="container mt-4 content-section">
+        <div class="row">
+            <div class="col-md-11 col-md-push-11">
+				<h3  class="mb-3">Tithes and Offerings</h3>
+
+				<form action="{% url 'charge' %}" method="post" id="payment-form">
+					{% csrf_token %}
+					<div>
+						<label for="give_amount">Amount:</label>
+						<input class="border border-light rounded" type="text" name="amount" id="amount" value="" data-type="currency" title="Please enter an amount">
+						<label class="ml-3" for="email_address">Email address:</label>
+						<input class="border border-light rounded" required type="text" name="email" placeholder="Email...">
+					</div>
+
+					<div class="form-row">
+						<label class="mt-3" for="card-element">
+							Credit or debit card
+						</label>
+						<div id="card-element" class="form-control" style='height: 2.4em; padding-top: .7em;'>
+						<!-- A Stripe Element will be inserted here. -->
+						</div>
+
+						<!-- Used to display form errors. -->
+						<div id="card-errors" role="alert"></div>
+					</div>
+
+					<div class="mt-3">
+						<button class="btn btn-outline-info">Submit Payment</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	<script>
+		// Create a Stripe client. Public key offered from database
+		var stripe = Stripe('{{ publickey }}');
+
+		// Create an instance of Elements.
+		var elements = stripe.elements();
+
+		// Custom styling can be passed to options when creating an Element.
+		// (Note that this demo uses a wider set of styles than the guide below.)
+		var style = {
+		base: {
+			color: '#32325d',
+			fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+			fontSmoothing: 'antialiased',
+			fontSize: '16px',
+			'::placeholder': {
+			color: '#aab7c4'
+			}
+		},
+		invalid: {
+			color: '#fa755a',
+			iconColor: '#fa755a'
+		}
+		};
+
+		// Create an instance of the card Element.
+		var card = elements.create('card', {style: style});
+
+		// Add an instance of the card Element into the `card-element` <div>.
+		card.mount('#card-element');
+
+		// Handle real-time validation errors from the card Element.
+		card.addEventListener('change', function(event) {
+		var displayError = document.getElementById('card-errors');
+		if (event.error) {
+			displayError.textContent = event.error.message;
+		} else {
+			displayError.textContent = '';
+		}
+		});
+
+		// Handle form submission.
+		var form = document.getElementById('payment-form');
+		form.addEventListener('submit', function(event) {
+		event.preventDefault();
+
+			stripe.createToken(card).then(function(result) {
+				if (result.error) {
+				// Inform the user if there was an error.
+				var errorElement = document.getElementById('card-errors');
+				errorElement.textContent = result.error.message;
+				} else {
+				// Send the token to your server.
+				stripeTokenHandler(result.token);
+				}
+			});
+		});
+
+		// Submit the form with the token ID.
+		function stripeTokenHandler(token)
+		{
+		// Insert the token ID into the form so it gets submitted to the server
+		var form = document.getElementById('payment-form');
+		var hiddenInput = document.createElement('input');
+		hiddenInput.setAttribute('type', 'hidden');
+		hiddenInput.setAttribute('name', 'stripeToken');
+		hiddenInput.setAttribute('value', token.id);
+		form.appendChild(hiddenInput);
+
+		// Submit the form
+		form.submit();
+		}
+
+		////
+		//Currency trailing zeroes
+		////
+
+		$("input[data-type='currency']").on({
+			keyup: function()
+			{
+			  formatCurrency($(this));
+			},
+			blur: function()
+			{ 
+			  formatCurrency($(this), "blur");
+			}
+		});
+		
+		function formatNumber(n)
+		{
+		  // format number 1000000 to 1,234,567
+		  return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+		}
+		
+		
+		function formatCurrency(input, blur)
+		{
+		  // appends $ to value, validates decimal side
+		  // and puts cursor back in right position.
+		  
+		  // get input value
+		  var input_val = input.val();
+		  
+		  // don't validate empty input
+		  if (input_val === "")
+		  {
+			return;
+		  }
+		  
+		  // original length
+		  var original_len = input_val.length;
+		
+		  // initial caret position 
+		  var caret_pos = input.prop("selectionStart");
+			
+		  // check for decimal
+		  if (input_val.indexOf(".") >= 0)
+		  {		
+			// get position of first decimal
+			// this prevents multiple decimals from
+			// being entered
+			var decimal_pos = input_val.indexOf(".");
+		
+			// split number by decimal point
+			var left_side = input_val.substring(0, decimal_pos);
+			var right_side = input_val.substring(decimal_pos);
+		
+			// add commas to left side of number
+			left_side = formatNumber(left_side);
+		
+			// validate right side
+			right_side = formatNumber(right_side);
+			
+			// On blur make sure 2 numbers after decimal
+			if (blur === "blur")
+			{
+			  right_side += "00";
+			}
+			
+			// Limit decimal to only 2 digits
+			right_side = right_side.substring(0, 2);
+		
+			// join number by .
+			input_val = "$" + left_side + "." + right_side;
+		
+		  }
+		  else
+		  {
+			// no decimal entered
+			// add commas to number
+			// remove all non-digits
+			input_val = formatNumber(input_val);
+			
+			// final formatting
+			if (blur === "blur")
+			{
+				if (input_val.toString().length == 1)
+				{
+					input_val = "0.0" + input_val;
+				}
+				else if (input_val.toString().length == 2)
+				{
+					input_val = "0." + input_val;
+				}
+				else
+				{
+					input_val += ".00";
+				}
+			}
+
+			input_val = "$" + input_val;
+		  }
+		  
+		  // send updated string to input
+		  input.val(input_val);
+		
+		  // put caret back in the right position
+		  var updated_len = input_val.length;
+		  caret_pos = updated_len - original_len + caret_pos;
+		  input[0].setSelectionRange(caret_pos, caret_pos);
+		}
+	</script>
+{% endblock content %}

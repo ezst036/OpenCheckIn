@@ -10,6 +10,7 @@ chromedriver_autoinstaller.install()
 driver = webdriver.Chrome(service=Service())
 
 url = "http://ezst036.pythonanywhere.com/"
+driver.maximize_window()
 driver.get(url)
 
 time.sleep(3)
@@ -36,6 +37,21 @@ time.sleep(3)
 menulink.click()
 time.sleep(3)
 
+parentcheck = driver.find_element(By.NAME, "is_parent")
+parentcheck.click()
+time.sleep(2)
+
+updatebutton = driver.find_element(By.NAME, "updateButton")
+updatebutton.click()
+time.sleep(2)
+
+parentTab = driver.find_element(By.LINK_TEXT, "Parent info")
+parentTabHover = ActionChains(driver).move_to_element(parentTab)
+parentTabHover.perform()
+parentTab.click()
+
+time.sleep(5)
+
 youthcreate = ActionChains(driver)
 youthcreate = driver.find_element(By.NAME, 'youth_first_name')
 youthcreate.clear()
@@ -57,7 +73,7 @@ time.sleep(40)
 
 btnclick = driver.find_element(By.NAME, 'submitYouth')
 btnclick.click()
-time.sleep(5)
+time.sleep(7)
 
 ############################################################
 # If you do not add an image manually, the youth object will
@@ -68,16 +84,6 @@ time.sleep(5)
 # acts differently than when using this functionality as
 # a human.  The same functionality is achieved by
 # re-entering the profile page.
-
-link = driver.find_element(By.ID, "dropdown08")
-link.click()
-time.sleep(2)
-
-menulink = driver.find_element(By.LINK_TEXT, "Profile")
-login.move_to_element(menulink).perform()
-time.sleep(4)
-menulink.click()
-time.sleep(7)
 
 link = driver.find_element(By.LINK_TEXT, "Logout")
 link.click()

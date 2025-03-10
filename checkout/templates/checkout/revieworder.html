@@ -1,0 +1,30 @@
+{% extends "checkout/base.html" %}
+{% load static %}
+
+{% block title %}
+    Pay in full
+{% endblock %}
+{% block storecontent %}
+    <h2>Review order:</h2>
+
+    <tbody>
+        {% for item in cart %}
+            {% with product=item.product %}
+                <tr>
+                    <td><p>Product: {{ product.name }} Price: ${{ item.price }} Quantity: {{ item.quantity }}</p></td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+    </tbody>
+
+    <h2>Total is ${{ viewamount }}</h2>
+    <form action="{% url 'paycharge' %}" method="post">
+        {% csrf_token %}
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="{{ key }}"
+            data-description="Pay gateway test"
+            data-amount="{{ payamount }}"
+            data-locale="auto">
+        </script>
+    </form>
+{% endblock storecontent %}

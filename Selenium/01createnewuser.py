@@ -13,14 +13,15 @@ chromedriver_autoinstaller.install()
 driver = webdriver.Chrome(service=Service())
 
 url = "http://ezst036.pythonanywhere.com/"
+driver.maximize_window()
 driver.get(url)
 
 # Pause on screen for one second
-time.sleep(1)
+time.sleep(4)
 
 link = driver.find_element(By.LINK_TEXT, "Register")
 link.click()
-time.sleep(1)
+time.sleep(4)
 
 # Create a new user account
 
@@ -34,11 +35,11 @@ create.perform()
 
 link = driver.find_element(By.LINK_TEXT, "Home")
 link.click()
-time.sleep(1)
+time.sleep(4)
 
 link = driver.find_element(By.LINK_TEXT, "Register")
 link.click()
-time.sleep(1)
+time.sleep(4)
 
 # Create a new account which will be used with
 # a different set of permissions in other tests
@@ -51,7 +52,7 @@ create.send_keys("Aut0Pa$$!", Keys.TAB)
 create.send_keys(Keys.ENTER)
 create.perform()
 
-time.sleep(15)
+time.sleep(6)
 
 # Note: For production systems, all autoUser or autoStaff
 # or any other profiles with usernames and passwords typed

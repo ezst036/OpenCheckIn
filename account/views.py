@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
 from account.forms import RegistrationForm
 from account.models import UIPrefs
 
@@ -23,7 +22,7 @@ def registration_view(request):
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password')
             account = form.save()
-            messages.success(request, f'Enjoy using Open Check In')
+            messages.success(request, f'Account created! Enjoy using Open Check In - Please log in to begin.')
             return redirect('home')
         else:
             context['registration_form'] = form

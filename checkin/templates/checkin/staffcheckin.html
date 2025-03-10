@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
 {% block aircraft %}
-    <div div class="container mt-4 content-section">
-    <div class="float-right">
-        <button class="btn btn-success form-control" onClick="camCheck()">Scan code</button>
+<div class="float-right">
+    <a href=# class="btn btn-secondary form-control" id="openScan">Hide QR scanner</a>
+
+    <div id="scannerDiv">
+        <div id="reader"></div>
     </div>
+</div>
+<div div class="container mt-4 content-section">
     <center>
-        <h2> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Check in</h2>
+        <h2> &nbsp; &nbsp; &nbsp; &nbsp;Check in</h2>
     </center>
     <hr>
 
@@ -44,7 +48,7 @@
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" onClick="multiCheckin()">Save changes</button>
+                        <button class="btn btn-primary" onClick="multiCheckin()" id="checkInYouthsBtn">Save changes</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -53,133 +57,133 @@
     </div>
 
     <h3>Pre-checked in</h3>
-        <div class="border-top border-bottom pt-3 mb-3">
-            <table id="youthTable" class="table table-striped">
-                <tbody>
-                    {% for youth in youts %}
-                        {% if youth.pre_check %}
-                            <tr>
-                                <th></th>
-                                <th>First</th>
-                                <th>Middle</th>
-                                <th colspan="3">Last</th>
-                            </tr>
-                            <tr id="youth-{{youth.id}}" name="scanyouthitem">
-                                <form id="updateYouth" action="">
-                                    <td class="youthim youthData" name="youth_img">
-                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
-                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
-                                        </a>
-                                    </td>
-                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
-                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
-                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
-                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
-                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
-                                    </td>
-                                    <td align="center">
-                                        <div class="form-group">
-                                            {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
-                                            {% else %}
-                                                <button class="btn btn-success form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </form>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    
-    <h3>Ready for check in</h3>
-        <div class="border-top border-bottom pt-3 mb-3">
-            <table id="youthTable" class="table table-striped">
-                <tbody>
-                    {% for youth in youts %}
-                        {% if not youth.pre_check and not youth.is_checked_in %}
-                            <tr>
-                                <th></th>
-                                <th>First</th>
-                                <th>Middle</th>
-                                <th colspan="9">Last</th>
-                            </tr>
-                            <tr id="youth-{{youth.id}}">
-                                <form id="updateYouth" action="">
-                                    <td class="youthim youthData" name="youth_img">
-                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
-                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
-                                        </a>
-                                    </td>
-                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
-                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
-                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
-                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
-                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
-                                    </td>
-                                    <td name="test" hidden>test</td>
-                                    <td align="center">
-                                        <div class="form-group">
-                                            {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
-                                            {% else %}
-                                                <button class="btn btn-success form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </form>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    
-    <h3>Checked in</h3>
-        <div class="border-top pt-3">
-            <table id="youthTable" class="table table-striped">
-                <tbody>
-                    {% for youth in youts %}
-                        {% if youth.is_checked_in %}
-                            <tr>
-                                <th></th>
-                                <th>First</th>
-                                <th>Middle</th>
-                                <th colspan="3">Last</th>
-                            </tr>
-                            <tr id="youth-{{youth.id}}">
-                                <form id="updateYouth" action="">
-                                    <td class="youthim youthData" name="youth_img">
-                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
-                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
-                                        </a>
-                                    </td>
-                                    <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
-                                    <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
-                                    <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
-                                    <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
-                                        <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
-                                    </td>
-                                    <td name="test" hidden>test</td>
-                                    <td align="center">
-                                        <div class="form-group">
-                                            {% if youth.is_checked_in %}
-                                                <button class="btn btn-outline-info form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
-                                            {% else %}
-                                                <button class="btn btn-success form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </form>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="border-top border-bottom pt-3 mb-3">
+        <table id="youthTable" class="table table-striped">
+            <tbody>
+                {% for youth in youts %}
+                    {% if youth.pre_check %}
+                        <tr>
+                            <th></th>
+                            <th>First</th>
+                            <th>Middle</th>
+                            <th colspan="3">Last</th>
+                        </tr>
+                        <tr id="youth-{{youth.id}}" name="scanyouthitem">
+                            <form id="updateYouth" action="">
+                                <td class="youthim youthData" name="youth_img">
+                                    <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                        <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                    </a>
+                                </td>
+                                <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                    <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                </td>
+                                <td align="center">
+                                    <div class="form-group">
+                                        {% if youth.is_checked_in %}
+                                            <button class="btn btn-outline-info form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                        {% else %}
+                                            <button class="btn btn-success form-control" name="checkedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+    <h3>Ready for check in</h3>
+    <div class="border-top border-bottom pt-3 mb-3">
+        <table id="youthTable" class="table table-striped">
+            <tbody>
+                {% for youth in youts %}
+                    {% if not youth.pre_check and not youth.is_checked_in %}
+                        <tr>
+                            <th></th>
+                            <th>First</th>
+                            <th>Middle</th>
+                            <th colspan="9">Last</th>
+                        </tr>
+                        <tr id="youth-{{youth.id}}">
+                            <form id="updateYouth" action="">
+                                <td class="youthim youthData" name="youth_img">
+                                    <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                        <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                    </a>
+                                </td>
+                                <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                    <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                </td>
+                                <td name="test" hidden>test</td>
+                                <td align="center">
+                                    <div class="form-group">
+                                        {% if youth.is_checked_in %}
+                                            <button class="btn btn-outline-info form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                        {% else %}
+                                            <button class="btn btn-success form-control" name="notCheckedIn({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Checked in</h3>
+    <div class="border-top pt-3">
+        <table id="youthTable" class="table table-striped">
+            <tbody>
+                {% for youth in youts %}
+                    {% if youth.is_checked_in %}
+                        <tr>
+                            <th></th>
+                            <th>First</th>
+                            <th>Middle</th>
+                            <th colspan="3">Last</th>
+                        </tr>
+                        <tr id="youth-{{youth.id}}">
+                            <form id="updateYouth" action="">
+                                <td class="youthim youthData" name="youth_img">
+                                    <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                        <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                    </a>
+                                </td>
+                                <td class="youthfn youthData" name="youth_first_name" id="yfnid">{{youth.youth_first_name}}</td>
+                                <td class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                <td class="youthlm youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
+                                <td class="youthcheck youthData" name="is_checked_in" id="ycnid">
+                                    <input type="checkbox" name="is_checked_in" class="youthcb youthData" style="display:none" {% if youth.is_checked_in %}checked{% endif %} />
+                                </td>
+                                <td name="test" hidden>test</td>
+                                <td align="center">
+                                    <div class="form-group">
+                                        {% if youth.is_checked_in %}
+                                            <button class="btn btn-outline-info form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check out</button>
+                                        {% else %}
+                                            <button class="btn btn-success form-control" name="checkOut({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Check in</button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock aircraft %}
 
 {% block javascript %}
@@ -310,6 +314,77 @@ function multiCheckin() {
         }
     });
 }
+
+function onScanSuccess(decodedText, decodedResult) {
+    console.log("Found decoded text: " + decodedText);
+    console.log("Found decoded result:" + decodedResult);
+
+    $.ajax({
+        type: "GET",
+        url: '{% url "ajax_call_camCheck" %}',
+        data: {
+                json_data: JSON.stringify({ scannedData: decodedText })
+        },
+        dataType: 'json',
+        success: function (data) {
+            for (const youtitem of data.youth) {
+                appendToCheckInTable(youtitem);
+            }
+
+            let checkinmodal = document.getElementById("checkinModal");
+            checkinmodal.style.display = "block";
+            $('#checkinModal').modal('show')
+        }
+    });
+}
+
+var qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
+    var minEdgeSizeThreshold = 250;
+    var edgeSizePercentage = 0.75;
+    var minEdgeSize = (viewfinderWidth > viewfinderHeight) ?
+        viewfinderHeight : viewfinderWidth;
+    var qrboxEdgeSize = Math.floor(minEdgeSize * edgeSizePercentage);
+    if (qrboxEdgeSize < minEdgeSizeThreshold) {
+        if (minEdgeSize < minEdgeSizeThreshold) {
+            return {width: minEdgeSize, height: minEdgeSize};
+        } else {
+            return {
+                width: minEdgeSizeThreshold,
+                height: minEdgeSizeThreshold
+            };
+        }
+    }
+    return {width: qrboxEdgeSize, height: qrboxEdgeSize};
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader", 
+    { 
+        fps: 10,
+        qrbox: qrboxFunction,
+        experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+        },
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true
+    });
+html5QrcodeScanner.render(onScanSuccess);
+
+$("#openScan").on({
+    click: function() {
+        $("#scannerDiv").toggle();
+
+        if ($("#scannerDiv").is(":visible")) {
+            $(this).text("Hide QR scanner");
+            $(this).addClass("btn-secondary")
+            $(this).removeClass("btn-primary")
+        } else {
+            $(this).text("Show QR scanner");
+            $(this).removeClass("btn-secondary")
+            $(this).addClass("btn-primary")
+        }
+    }
+});
 
 </script>
 {% endblock javascript%}

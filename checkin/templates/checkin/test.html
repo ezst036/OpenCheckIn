@@ -3,12 +3,22 @@
 {% block aircraft %}
 
 <html>
-
+    <head>
+        <style>
+            #map {
+                height: 750px;
+                width: 750px;
+            }   
+        </style>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    </head>
     <body>
         <main class="bd-masthead" id="content" role="main">
             <div class="container">
                 <div>
-                    <h5 class="mb-3 mt-4 text-dark">Open Check In is an open source system designed to streamline attendance for children's ministry and other educational events.</h5>
+                    <h5 class="mt-4 text-dark">Open Check In is an open source system designed to streamline attendance for children's ministry.</h5>
+                    <h5 class="mb-3 text-dark">Additional functionality enables educational event handling, payment processing, tithing, mapping, and more!</h5>
                 </div>
             </div>
 
@@ -23,12 +33,15 @@
                     <li class="ml-5 text-dark">Intranet-capable</li>
                     <li class="ml-5 text-dark">Customizeable with your theme</li>
                     <li class="ml-5 text-dark">Map embed with Open Street Map</li>
-                    <li class="ml-5 text-dark">Works across your entire local network</li>
+                    <li class="ml-5 text-dark">Works across your entire local network for free</li>
                     <li class="ml-5 text-dark">Compatible with open source Kiosks such as Porteus Kiosk</li>
                     <li class="ml-5 text-dark">Compatible with Android smart phones and tablets as well as Apple iPhone and iPad</li>
                     <li class="ml-5 text-dark">Compatible with all major operating systems: Linux, Windows, MacOS, and FreeBSD</li>
+                    <li class="ml-5 text-dark">Works as a stand-alone full-screen mission mapping tool</li>
+                    <li class="ml-5 text-dark">Independent preferences that individually tailor to your needs</li>
+                    <li class="ml-5 text-dark">Process tithes, manage events, and more</li>
                 </ul>
-                <p class="mb-3 mt-4 text-dark">Open Check In relies on many well-established and trusted open source initiatives: Python, Django, Bootstrap, Popper, Jquery, OpenCV, Pixelcog, Pixabay and more.</p>
+                <p class="mb-3 mt-4 text-dark">Open Check In relies on many well-established and trusted open source initiatives: Python, Django, Bootstrap, Popper, Jquery, html5-qrcode, LeafletJS, Pixelcog, Pixabay and many more.</p>
             </div>
 
             <div class="floattext parallax-window" data-parallax="scroll" data-image-src="/media/crosses.jpg">
@@ -38,12 +51,23 @@
             <div class="container">
                 {% if preferences.map %}
                     <div class="mb-3 mt-4 pb-4">
-                        <iframe width="{{preferences.mapwidth}}" height="{{preferences.mapheight}}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
-                            src="https://www.openstreetmap.org/export/embed.html?bbox={{preferences.longitude}}%2C{{preferences.latitude}}%2C{{preferences.lonzoom}}%2C{{preferences.latzoom}}&amp;layer=mapnik{% if preferences.enable_marker %}&amp;marker={{preferences.latmarker}}%2C{{preferences.lonmarker}}{% endif %}"
-                            style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat={{preferences.latmarker}}&amp;mlon={{preferences.lonmarker}}#map=15/{{preferences.latmarker}}/{{preferences.lonmarker}}">View Larger Map</a></small>
+                        <div class="container" id="map"></div>
                     </div>
                 {% endif %}
             </div>
+
+            <script>
+                var map = L.map('map').setView([{{preferences.latitude}}, {{preferences.longitude}}], 13);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                var marker = L.marker([{{preferences.latitude}}, {{preferences.longitude}}]).addTo(map);
+
+                marker.bindPopup("<b>Open Check In</b><br>").openPopup();
+            </script>
         </main>
     </body>
 </html>

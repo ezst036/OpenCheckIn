@@ -14,6 +14,7 @@ chromedriver_autoinstaller.install()
 driver = webdriver.Chrome(service=Service())
 
 url = "http://ezst036.pythonanywhere.com/"
+driver.maximize_window()
 driver.get(url)
 
 # Pause on screen for two seconds
@@ -41,8 +42,15 @@ time.sleep(2)
 menulink.click()
 time.sleep(2)
 
+parentTab = driver.find_element(By.LINK_TEXT, "Parent info")
+parentTabHover = ActionChains(driver).move_to_element(parentTab)
+parentTabHover.perform()
+parentTab.click()
+
+time.sleep(5)
+
 youthcheckin = ActionChains(driver)
-youthcheckin = driver.find_element(By.NAME, 'checkinYouth(2)')
+youthcheckin = driver.find_element(By.NAME, 'checkinYouth(1)')
 youthcheckin.click()
 
 link = driver.find_element(By.LINK_TEXT, "Logout")
@@ -78,7 +86,7 @@ time.sleep(3)
 # checked in, a staff member has checked them in
 
 staffcheckin = ActionChains(driver)
-staffcheckin = driver.find_element(By.NAME, 'checkedIn(2)')
+staffcheckin = driver.find_element(By.NAME, 'checkedIn(1)')
 staffcheckin.click()
 time.sleep(2)
 
@@ -86,9 +94,9 @@ time.sleep(2)
 time.sleep(10)
 
 staffcheckin = ActionChains(driver)
-staffcheckin = driver.find_element(By.NAME, 'checkOut(2)')
+staffcheckin = driver.find_element(By.NAME, 'checkOut(1)')
 staffcheckin.click()
-time.sleep(2)
+time.sleep(4)
 
 # After checking out, youth should move to the "Ready
 # for check in" queue because a parent has not yet

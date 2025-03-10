@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
+{% block title %}Logout Complete{% endblock %}
+
 {% block aircraft %}
-    <h2>You have been logged out</h2>
-    <div class="border-top pt-3">
+    <div class="mt-4 ml-5 pl-5">
+        <legend class="border-bottom">You have been logged out</legend>
+
         <small class="text-muted">
             <a href="{% url 'login' %}">Log In Again</a>
         </small>

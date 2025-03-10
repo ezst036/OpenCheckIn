@@ -1,0 +1,25 @@
+{% extends "checkout/base.html" %}
+{% load static %}
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+{% block storecontent %}
+<div class="row">
+    <div class="col-md-4 col-md-push-4 border-right">
+        <img width="275" src="{% if product.image %}{{ product.image.url }}{% else %}{% static "img/no_image.png" %}{% endif %}">
+    </div>
+    <div class="col-md-6 col-md-push-6">
+        <h1>{{ product.name }}</h1>
+        <h2><a href="{{ product.category.get_absolute_url }}">
+            {{ product.category }}
+        </a></h2>
+        <p class="price">${{ product.price }}</p>
+        <form action="{% url "addtocart" product.id %}" method="post">
+            {{ cart_product_form }}
+            {% csrf_token %}
+            <button type="submit" value="">Add to cart</button>
+        </form>
+        {{ product.description|linebreaks }}
+    </div>
+</div>
+{% endblock storecontent %}

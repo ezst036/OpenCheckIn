@@ -21,14 +21,19 @@ SECRET_KEY = '#*xxa+_9&!0=s)32sn3tn&p1#3(817-mhpi0%y2&j$whz#k%+g'
 DEBUG = True
 
 #Use port 8000
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.0.19', '192.168.3.164']
+ALLOWED_HOSTS = ['127.0.0.1', 'something.pythonanywhere.com', '192.168.0.19', '192.168.40.8']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'tithe.apps.TitheConfig',
     'checkin.apps.CheckinConfig',
+    'checkout.apps.CheckoutConfig',
+    'event.apps.EventConfig',
+    'connect',
     'account',
+    'missionmap.apps.MissionmapConfig',
     'phone_field',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'checkout.context_processors.cart',
             ],
         },
     },
@@ -132,3 +138,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL = 'home'
 #LOGOUT_REDIRECT_URL = 'register'
 LOGIN_URL = 'login'
+
+CART_SESSION_ID = 'cart'

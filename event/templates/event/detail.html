@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <head>
+        <style>
+            #map {
+                height: 400px;
+                width: 550px;
+            }   
+        </style>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    </head>
+    <body>
+        <div class="container mt-3 mb-5">
+            <div class="row ml-5">
+                <div class="mt-2 col-md-4 col-md-push-4 border-right">
+                    <img width="275" src="{% if product.image %}{{ product.image.url }}{% else %}{% static "img/no_image.png" %}{% endif %}">
+                </div>
+                <div class="col-md-6 col-md-push-6">
+                    <h1>{{ product.name }}</h1>
+                    <p class="price">${{ product.price }}</p>
+                    <form action="{% url 'reviewevent' %}" method="post">
+            
+                        {% csrf_token %}
+                        <input type="hidden" name="item_name" value="{{product.name}}">
+                        <input type="hidden" name="item_id" value="{{product.id}}">
+                        <input type="hidden" name="item_price" value="{{product.price}}">
+                        <button id="signupbutton" type="submit">Sign up</button>
+                    </form>
+                    <p>Description:</p>
+                    {{ product.description }}
+                </div>
+            </div>
+        </div>
+
+        <div class="container border-top mt-2 pt-2">
+            {% if user.is_pastor == True %}
+                <div class="row ml-5">
+                    <div class="col-md-auto">
+                        <div class="container" id="map"></div>
+                    </div>
+                    <div class="col-md-auto">
+                        <h4>Search: </h4>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input class="mb-4" name="location"><br />
+                            <button class="btn btn-outline-info" type="submit">Update location</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="container" id="map"></div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <script>
+            var map = L.map('map').setView([{{latitude}}, {{longitude}}], 5);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            var marker = L.marker([{{latitude}}, {{longitude}}]).addTo(map);
+        </script>
+    </body>
+{% endblock content %}

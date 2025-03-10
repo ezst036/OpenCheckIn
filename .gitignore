@@ -1,1 +1,23 @@
+#Ignore database
 db.sqlite3
+
+#Ignore pycache files
+*.pyc
+
+#Ignore initialization
+*initial.py
+
+#Ignore all migration files contained in module subfolders
+account/migrations/*
+checkin/migrations/*
+checkout/migrations/*
+connect/migrations/*
+event/migrations/*
+missionmap/migrations/*
+tithe/migrations/*
+
+#Ignore event photos, checkout photos, profile_pics, and qrcodes
+media/checkout/*
+media/events/*
+media/profile_pics/*
+media/qrcodes/*

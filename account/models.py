@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from phone_field import PhoneField
 from datetime import datetime
 from django.db.models.signals import pre_save, post_save
@@ -37,7 +37,7 @@ class MyAccountManager(BaseUserManager):
 		user.save(using=self._db)
 		return user
 
-class Account(AbstractBaseUser):
+class Account(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="email",
 		max_length=60, unique=True)
     username = models.CharField(max_length=100, unique=True)
@@ -67,14 +67,8 @@ class Account(AbstractBaseUser):
 
     objects = MyAccountManager()
 
-    def __str__(self):
-        return self.first_name + ' ' + self.middle_name + ' ' + self.last_name
-
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
-
-    def has_module_perms(self, app_label):
-        return True
+    #def __str__(self):
+        #return self.first_name + ' ' + self.middle_name + ' ' + self.last_name
 
 #Call the signal to remove old picture file
 pre_save.connect(remove_old_file, sender=Account)
@@ -124,21 +118,19 @@ class UIPrefs(models.Model):
     church_postal_code = models.CharField(verbose_name="Postal code", max_length=25, default="99999-9999")
     show_address_two = models.BooleanField(verbose_name="Show more address", default=False)
     church_address_two = models.CharField(verbose_name="Church Address two", max_length=255, default="Optional lot number")
-    open_registration = models.BooleanField(verbose_name="Open registration", default=True)
-    intranet = models.BooleanField(verbose_name="Intranet login", default=True)
     main_background = models.ImageField(default='crosses.jpg')
     enable_qr = models.BooleanField(default=True)
+    open_registration = models.BooleanField(verbose_name="Open registration", default=True)
+    intranet = models.BooleanField(verbose_name="Intranet login", default=True)
+    connect = models.BooleanField(verbose_name="Enable connect", default=True)
+    tithe = models.BooleanField(verbose_name="Enable tithing", default=True)
+    events = models.BooleanField(verbose_name="Enable events", default=True)
+    store = models.BooleanField(verbose_name="Enable store", default=True)
     map = models.BooleanField(verbose_name="Enable map", default=True)
-    latitude = models.CharField(verbose_name="Latitude", max_length=20, default="25.036289")
-    longitude = models.CharField(verbose_name="Longitude", max_length=20, default="-77.481326")
-    latzoom = models.CharField(verbose_name="Latitude zoom", max_length=20, default="25.054631")
-    lonzoom = models.CharField(verbose_name="Longitude zoom", max_length=20, default="-77.458766")
-    enable_marker = models.BooleanField(verbose_name="Enable map marker", default=True)
-    latmarker = models.CharField(verbose_name="Latitude marker", max_length=20, default="25.045844")
-    lonmarker = models.CharField(verbose_name="Longitude marker", max_length=20, default="-77.470222")
-    mapheight = models.CharField(verbose_name="Map height", max_length=20, default="400")
-    mapwidth = models.CharField(verbose_name="Map width", max_length=20, default="600")
-
+    latitude = models.CharField(verbose_name="Latitude", max_length=20, default="0")
+    longitude = models.CharField(verbose_name="Longitude", max_length=20, default="-0")
+    mapidentification = models.CharField(verbose_name="Map identification", max_length=255, null=True, default="SetChurchNameHere, newOpenCheckIn@Install")
+    
     class Meta:
         verbose_name = "UI Preference"
         verbose_name_plural = "Preferences"

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+	<div div class="container mt-4 content-section">
+		<div class="row">
+			<div class="col-md-11 col-md-push-11">
+				<h4>Thank you for your tithe of {{ amount }}!</h4>
+				<p>Your tithe history will be available in your user profile.</p>
+				<hr>
+				<a class="myButton" href="{% url 'tithe' %}">Return to the tithe page</a>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

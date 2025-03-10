@@ -1,166 +1,308 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block aircraft %}
-    <div div class="container mt-4 content-section">
-        <div class="row">
-        
-            <!-- Left side -->
-            <div class="col-md-6 col-md-push-6">
-                <div class="media">
-                    <div class="border-right">
-                        <a href={{ user.users_profile.image.url }}>
-                            <img class="account-img mr-4" width=200
-                            src="{{ user.image.url }}">
-                        </a>
+    <div div class="container mt-4 mb-4 content-section">
+        <!-- Bootstrap modal -->
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                     </div>
-                    <div class="media-body">
-                        <h2 class="account-heading ml-4">Username: {{ user.username }}</h2>
-                        <p class="text-secondary ml-4">Email address: {{ user.email }}</p>
+                    <div class="modal-body" id="imgName">
+                        <img class="modal-content" src="" id="showImg" style="width: 400px; height: 264px;" >
                     </div>
-                </div>
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                        <div class="col-sm-6">
-                            <fieldset class="form-group">
-                                <legend class="border-bottom mb-4">Profile Info</legend>
-                                {{ p_form|crispy }}
-                            </fieldset>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-outline-info" name="updateButton" type="submit">Update</button>
-                        </div>
-                </form>
-
-                {% if user.is_pastor == True %}
-                    <hr>
-                    Hello Pastor!
-                {% endif %}
-
-            </div>
-
-            <!-- Bootstrap modal -->
-            <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        </div>
-                        <div class="modal-body" id="imgName">
-                            <img class="modal-content" src="" id="showImg" style="width: 400px; height: 264px;" >
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right side -->
-            <div class="col-md-6 col-md-pull-6">
-                <div class="col-md-10">
-                    <div class="content-section">
-                        <h3>Sidebar</h3>
-                        <p class='text-muted'>Parent information. <!-- Sidebar can be used later for volunteers, missionaries, etc -->
-                            {% if user.is_parent == True %}
-                                <ul class="list-group">
-                                    <li class="list-group-item list-group-item-light">
-                                        <h3>Add Youth</h3>
-                                            <form id="addYouth" method="POST" enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <div class="form-group">
-                                                <input class="form-control" type="text" name="youth_first_name" id="youth_f_n_id" placeholder="First name" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control" type="text" name="youth_middle_name" id="youth_m_n_id" placeholder="Middle name" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control" type="text" name="youth_last_name" id="youth_l_n_id" min="10" max="100" placeholder="Last name" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control" type="file" name="youth_img" id="youth_img_id" placeholder="Photo" required>
-                                            </div>
-                                            <button class="btn btn-primary form-control" name="submitYouth" id="submitYouthBtn" type="submit">SUBMIT</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="border-bottom mb-4"></div>
-                    <div class="form-group">
-                        {% if user.is_parent == True %}
-                            <table id="youthTable" class="table">
-                                <tbody>
-                                {% for family in fams %}
-                                    {% if user.id == family.guardian_id %}
-                                        {% for youth in youts %}
-                                            {% if youth.id == family.youth_id %}
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th></th> <!-- First name -->
-                                                        <th>First</th> <!-- Middle name -->
-                                                        <th colspan="3"></th> <!-- Last name -->
-                                                    </tr>
-                                                </thead>
-                                                <tr id="youth-{{youth.id}}">
-                                                    <td class="youthim youthData" name="youth_img">
-                                                        <a href="#" data-toggle="modal" data-target="#imagemodal">
-                                                            <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
-                                                        </a>
-                                                    </td>
-                                                    <td class="youthfn youthData" name="youth_first_name">{{youth.youth_first_name}}</td>
-
-                                                    <form id="precheckYouth" action="">
-                                                        <td align="center">
-                                                            <div class="form-group">
-                                                                <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
-
-                                                                {% if youth.pre_check %}
-                                                                    <button class="btn btn-outline-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkout</button>
-                                                                {% else %}
-                                                                    <button class="btn btn-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkin</button>
-                                                                {% endif %}
-                                                            </div>
-                                                        </td>
-                                                    </form>
-                                                    
-                                                    <td align="center">
-                                                        <div class="form-group">
-                                                            <button class="btn btn-outline-info form-control" id="editTblBtn-{{youth.id}}" onClick="editYouth('{{ youth.id }}',
-                                                                                                                                 '{{ youth.youth_first_name }}',
-                                                                                                                                 '{{ youth.youth_middle_name }}',
-                                                                                                                                 '{{ youth.youth_last_name }}',
-                                                                                                                                 '{{ youth.image }}')"
-                                                                                                                                 data-toggle="modal" data-target="#youthModal")">EDIT</button>
-                                                        </div>
-                                                    </td>
-                                                    <td align="center">
-                                                        <button class="btn btn-outline-danger form-control" onClick="deleteYouth({{youth.id}})">DELETE</button>
-                                                    </td>
-                                                </tr>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            <div class="border-bottom mb-4"></div>
-
-                            <div class="qrcodediv pb-3" id="qrimg">
-                                {% if preferences == True %}
-                                    {% if not obj.completed %}
-                                        <h3 class="text-muted">Checkout code</h3>
-                                        <img src={{obj.qr_code.url}}></div>
-                                    {% else %} <!-- Do not show the button if the QR code is showing -->
-                                        <p><button class="btn btn-success form-control" onClick="createQR()">Create QR</button>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Tabs row -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#user" data-toggle="tab">User</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#parent" data-toggle="tab">Parent info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tithe" data-toggle="tab">Tithes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#events" data-toggle="tab">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#purchase" data-toggle="tab">Purchases</a>
+                    </li>
+                                    
+                    {% if user.is_pastor == True %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#pastor" data-toggle="tab">Pastor</a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="user">
+                    <!-- User tab -->
+                    <div class="col-md-6 col-md-push-6">
+                        <div class="media">
+                            <div class="border-right">
+                                <a href={{ user.users_profile.image.url }}>
+                                    <img class="account-img mr-4" width=200
+                                    src="{{ user.image.url }}">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h2 class="account-heading ml-4">Username: {{ user.username }}</h2>
+                                <p class="text-secondary ml-4">Email address: {{ user.email }}</p>
+                            </div>
+                        </div>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                                <div class="col-sm-6">
+                                    <fieldset class="form-group">
+                                        <legend class="border-bottom mb-4">Profile Info</legend>
+                                        {{ p_form|crispy }}
+                                    </fieldset>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-outline-info mb-3" name="updateButton" type="submit">Update</button>
+                                </div>
+                        </form>       
+                    </div>
+                </div>
+
+                <div class="tab-pane pt-3" id="parent">
+                    <!-- Parent tab -->
+                    <div class="col-md-6 col-md-pull-6">
+                        <div class="col-md-10">
+                            <div class="content-section">
+                                <h3>Children</h3>
+                                <p class='text-muted'>Parent information.  Please check the 'parent'
+                                    box on the User profile page.
+                                    {% if user.is_parent == True %}
+                                        <ul class="list-group">
+                                            <li class="list-group-item list-group-item-light">
+                                                <h3>Add Youth</h3>
+                                                    <form id="addYouth" method="POST" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <div class="form-group">
+                                                        <input class="form-control" type="text" name="youth_first_name" id="youth_f_n_id" placeholder="First name" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input class="form-control" type="text" name="youth_middle_name" id="youth_m_n_id" placeholder="Middle name" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input class="form-control" type="text" name="youth_last_name" id="youth_l_n_id" min="10" max="100" placeholder="Last name" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input class="form-control" type="file" name="youth_img" id="youth_img_id" placeholder="Photo" required>
+                                                    </div>
+                                                    <button class="btn btn-primary form-control" name="submitYouth" id="submitYouthBtn" type="submit">SUBMIT</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="border-bottom mb-4"></div>
+                            <div class="form-group">
+                                {% if user.is_parent == True %}
+                                    <table id="youthTable" class="table">
+                                        <tbody>
+                                        {% for family in fams %}
+                                            {% if user.id == family.guardian_id %}
+                                                {% for youth in youts %}
+                                                    {% if youth.id == family.youth_id %}
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th></th> <!-- First name -->
+                                                                <th>First</th> <!-- Middle name -->
+                                                                <th colspan="3"></th> <!-- Last name -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tr id="youth-{{youth.id}}">
+                                                            <td class="youthim youthData" name="youth_img">
+                                                                <a href="#" data-toggle="modal" data-target="#imagemodal">
+                                                                    <img class="myImg" height=30 width=30 src="/media/{{youth.image}}">
+                                                                </a>
+                                                            </td>
+                                                            <td class="youthfn youthData" name="youth_first_name">{{youth.youth_first_name}}</td>
+
+                                                            <form id="precheckYouth" action="">
+                                                                <td align="center">
+                                                                    <div class="form-group">
+                                                                        <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
+
+                                                                        {% if youth.pre_check %}
+                                                                            <button class="btn btn-outline-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkout</button>
+                                                                        {% else %}
+                                                                            <button class="btn btn-success form-control" name="checkinYouth({{forloop.counter}})" onClick="checkinYouth({{youth.id}})">Checkin</button>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </td>
+                                                            </form>
+                                                            
+                                                            <td align="center">
+                                                                <div class="form-group">
+                                                                    <button class="btn btn-outline-info form-control" id="editTblBtn-{{youth.id}}" onClick="editYouth('{{ youth.id }}',
+                                                                                                                                        '{{ youth.youth_first_name }}',
+                                                                                                                                        '{{ youth.youth_middle_name }}',
+                                                                                                                                        '{{ youth.youth_last_name }}',
+                                                                                                                                        '{{ youth.image }}')"
+                                                                                                                                        data-toggle="modal" data-target="#youthModal">EDIT</button>
+                                                                </div>
+                                                            </td>
+                                                            <td align="center">
+                                                                <button class="btn btn-outline-danger form-control" onClick="deleteYouth({{youth.id}})">DELETE</button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="border-bottom mb-4"></div>
+
+                                    <div class="qrcodediv pb-3" id="qrimg">
+                                        {% if preferences.enable_qr == True %}
+                                            {% if not obj.completed %}
+                                                <h3 class="text-muted">After service checkout code</h3>
+                                                <img src={{obj.qr_code.url}}></div>
+                                            {% else %} <!-- Do not show the button if the QR code is showing -->
+                                                <p><button class="btn btn-success form-control" id="createqr" onClick="createQR()">Create QR</button>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane pt-3" id="tithe">
+                    <h3>Tithes and Offerings</h3>
+                    <div class="border-top pt-3">
+                        <table id="titleTable" class="table table-striped table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                                {% for tithe in tithelog %}
+                                    <tr>
+                                        <td name="none">
+                                            $ {{ tithe.giveAmount|floatformat:2 }}
+                                        </td>
+                                        <td name="none">
+                                            {{ tithe.giveDate }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane pt-3" id="events">
+                    <h3>Current Events</h3>
+                    {% include 'event/snippets/event_snippet.html' %}
+
+                    <hr>
+                    <h3>Event history</h3>
+                    <div class="border-top pt-3">
+                        <table id="eventTable" class="table table-striped table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Event name</th>
+                                    <th>Date</th>
+                                    <th>Confirmation number</th>
+                                </tr>
+                                {% for event in eventlog %}
+                                    <tr>
+                                        <td name="none">
+                                            {{ event.name }}
+                                        </td>
+                                        <td name="none">
+                                            {{ event.purchDate }}
+                                        </td>
+                                        <td name="none">
+                                            {{ event.confnum }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane pt-3" id="purchase">
+                    <h3>Purchase history</h3>
+                    <div class="border-top pt-3">
+                        <table id="purchaseTable" class="table table-striped table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>Item name</th>
+                                    <th>Quantity</th>
+                                    <th>Date</th>
+                                    <th>Confirmation number</th>
+                                </tr>
+                                {% for purch in itempurchaselog %}
+                                    <tr>
+                                        <td name="none">
+                                            {{ purch.prodname }}
+                                        </td>
+                                        <td name="none">
+                                            {{ purch.prodqty }}
+                                        </td>
+                                        <td name="none">
+                                            {{ purch.purchDate }}
+                                        </td>
+                                        <td name="none">
+                                            {{ purch.confnum }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if user.is_pastor == True %}
+                    <div class="tab-pane active" id="pastor">
+                        <div class="container mt-3 mb-5">
+                            <div class="text-center">
+                                <h4>Set church location</h4>
+                            <div>
+                            <div class="row border-top">
+                                <div class="col mt-4">
+                                    {% include 'missionmap/snippets/homelocation.html' %}
+                                </div>                                
+                                <div class="border-left mt-4 col-lg-4 col-lg-push-4">
+                                    <h4>Search:</h4>
+                                    <input class="form-control" id="form-location" type="text" name="formLocation" placeholder="Enter an address">
+                                    <br />
+                                    <label for="latitude">latitude</label>
+                                    <input class="form-control" id="form-lat" type="text" name="formLatitude" value="{{currlat}}" disabled/>
+                                    <label for="longitude">longitude</label>
+                                    <input class="form-control" id="form-lon" type="text" name="formLongitude" value="{{currlon}}" disabled/>
+                                    <br />
+                                    <button class="btn btn-outline-info form-control" id="locationupd" onClick="homeLocation()">Update location</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>    
 
         <!-- Youth Modal -->
         <div class="modal fade" id="youthModal" tabindex="-1" role="dialog" aria-labelledby="youthModalLabel">
@@ -314,19 +456,29 @@ $("form#updateYouth").submit(function() {
     var fnInput = $('input[name="formYFN"]').val().trim();
     var mnInput = $('input[name="formYMN"]').val().trim();
     var lnInput = $('input[name="formYLN"]').val().trim();
-    const input = document.getElementById('form-youthimg')
-    const img_data = input.files[0]
-    const fd = new FormData()
-    fd.append('csrfmiddlewaretoken', csrf[0].value)
-    fd.append('image', img_data)
-    fd.append('id', idInput)
-    fd.append('youth_first_name', fnInput)
-    fd.append('youth_middle_name', mnInput)
-    fd.append('youth_last_name', lnInput)
+    const input = document.getElementById('form-youthimg');
+    const img_data = input.files[0];
+    const ociblob = new Blob(['Open Check In'], { type: 'plain/text' });
+    const fd = new FormData();
+    fd.append('csrfmiddlewaretoken', csrf[0].value);
+    var imgsize = ociblob.size;
+
+    //Allow edits to youth without requiring a new image upload
+    if (img_data === undefined) {
+        fd.append('image', ociblob);
+    }
+    else {
+        fd.append('image', img_data);
+        var imgsize = img_data.size;
+    }
+    fd.append('id', idInput);
+    fd.append('youth_first_name', fnInput);
+    fd.append('youth_middle_name', mnInput);
+    fd.append('youth_last_name', lnInput);
     var btnName = document.getElementById('editTblBtn-' + idInput);
     btnName.disabled = true;
-    var imgsize = img_data.size;
     var imgsizelimit = 1024 * 1024 * 10;
+
     if (imgsize < imgsizelimit) {
         $.ajax({
             url: '{% url "ajax_call_updateYouth" %}',
@@ -341,14 +493,55 @@ $("form#updateYouth").submit(function() {
                 }
             }
         });
-       } else {
+    }
+    else {
         alert("Selected image cannot be larger than 10Mb.");
     }
-    //$('form#updateYouth').trigger("reset");
     $('#youthModal').modal('hide');
     closeDecorate();
     return false;
 });
+
+function homeLocation() {
+    let csrftoken = '{{ csrf_token }}'
+    let latitude = $('input[name="formLatitude"]').val().trim()
+    let longitude = $('input[name="formLongitude"]').val().trim()
+
+    $.ajax({
+        type: "POST",
+        headers:{'X-CSRFToken':csrftoken},
+        url: '{% url "ajax_set_homeLocation" %}',
+        data: {
+            'latitude': latitude,
+            'longitude': longitude,
+            'location': $('input[name="formLocation"]').val().trim(),
+        },
+        dataType: 'json',
+        success: function (response) {
+            map.eachLayer(function (layer) {
+                map.removeLayer(layer);
+            });
+
+            $('#form-lat').val(response.newlat);
+            $('#form-lon').val(response.newlon);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                minZoom: 0,
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            var marker = L.marker([response.newlat, response.newlon]).addTo(map);
+
+            map.panTo(new L.LatLng(response.newlat, response.newlon));
+
+            //Prevent panTo and setZoom from stepping on each other
+            setTimeout(function () {
+                map.setZoom(9);
+            }, 1000);
+        }
+    });
+}
 
 function editYouth(id, fn, mn, ln, img) {
     var btnName = document.getElementById('editTblBtn-' + id);

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<body>
+	<div class="container">
+		<h3 class="text-center text-dark mt-2 mb-3 pb-3">Review service and events</h3>
+		<div class="row">
+			<div class="col-md-7 col-md-push-7 border-right">
+				<h3 class="text-center text-dark mb-3 pb-3">Event:</h3>
+				<form action="{% url 'chargeevent' %}" method="post" id="payment-form">
+					{% csrf_token %}
+					{{ payform|crispy }}
+
+					<input type="hidden" name="item_name" value="{{event.name}}">
+					<input type="hidden" name="item_id" value="{{event.id}}">
+					<input type="hidden" name="item_price" value="{{event.price}}">
+					
+					{% if not event.nocost %}
+						{% include 'event/snippets/stripe_snippet.html' %}
+					{% endif %}
+
+					<div class="form-group"><button id="registration" class="btn btn-primary btn-block" type="submit">Complete Registration</button></div>
+				</form>
+			</div>
+			<div class="col-md-4 col-md-push-4">
+				<h3 class="text-center text-dark mb-3 pb-3">Personal:</h3>
+				<table>
+					<thead>
+					  
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan=2>{{ userform.email|as_crispy_field }}</td>
+						</tr>
+					  	<tr>
+							<td class="tg-0lax">{{ userform.first_name|as_crispy_field }}</td>
+							<td class="tg-0lax">{{ userform.last_name|as_crispy_field }}</td>
+					  	</tr>
+					  	<tr>
+							<td colspan=2>{{ userform.address|as_crispy_field }}</td>
+					  	</tr>
+						<tr>
+							<td colspan=2>{{ userform.city|as_crispy_field }}</td>
+					  	</tr>
+					  	<tr>
+							<td class="tg-0lax">{{ userform.phone_number|as_crispy_field }}</td>
+							<td class="tg-0lax">{{ userform.state|as_crispy_field }}</td>
+					  	</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Create a Stripe client.
+		var stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+
+		// Create an instance of Elements.
+		var elements = stripe.elements();
+
+		// Custom styling can be passed to options when creating an Element.
+		// (Note that this demo uses a wider set of styles than the guide below.)
+		var style = {
+			base: {
+				color: '#32325d',
+				fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+				fontSmoothing: 'antialiased',
+				fontSize: '16px',
+				'::placeholder': {
+				color: '#aab7c4'
+				}
+			},
+			invalid: {
+				color: '#fa755a',
+				iconColor: '#fa755a'
+			}
+		};
+
+		// Create an instance of the card Element.
+		var card = elements.create('card', {style: style});
+
+		// Add an instance of the card Element into the `card-element` <div>.
+		card.mount('#card-element');
+
+		// Handle real-time validation errors from the card Element.
+		card.addEventListener('change', function(event)
+		{
+			var displayError = document.getElementById('card-errors');
+				if (event.error)
+				{
+					displayError.textContent = event.error.message;
+				}
+				else
+				{
+					displayError.textContent = '';
+				}
+			}
+		);
+
+		// Handle form submission.
+		var form = document.getElementById('payment-form');
+		form.addEventListener('submit', function(event) {
+			event.preventDefault();
+
+			stripe.createToken(card).then(function(result) {
+				if (result.error) {
+				// Inform the user if there was an error.
+				var errorElement = document.getElementById('card-errors');
+				errorElement.textContent = result.error.message;
+				} else {
+				// Send the token to your server.
+				stripeTokenHandler(result.token);
+				}
+			});
+		});
+
+		// Submit the form with the token ID.
+		function stripeTokenHandler(token) {
+			// Insert the token ID into the form so it gets submitted to the server
+			var form = document.getElementById('payment-form');
+			var hiddenInput = document.createElement('input');
+			hiddenInput.setAttribute('type', 'hidden');
+			hiddenInput.setAttribute('name', 'stripeToken');
+			hiddenInput.setAttribute('value', token.id);
+			form.appendChild(hiddenInput);
+
+			// Submit the form
+			form.submit();
+		}
+	</script>
+</body>
+
+{% endblock content %}

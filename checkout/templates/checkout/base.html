@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <body>
+        <div style="background: #EEEEEE">
+            <div class="d-flex justify-content-end p-2 pr-5 mr-5">
+                {% with total_items=cart|length %}
+                    {% if total_items > 0 %}
+                        Your Cart:
+                        <a class="pl-2" href="{% url "cartdetails" %}">
+                            {{ total_items }} items ${{ cart.get_total_price }}
+                        </a>
+                    {% else %}
+                        Your Cart is Empty
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        <div class="container">
+            {% block storecontent %}
+
+            {% endblock storecontent %}
+        </div>
+    </body>
+{% endblock content %}
