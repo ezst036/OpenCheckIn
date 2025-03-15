@@ -21,7 +21,7 @@ SECRET_KEY = '#*xxa+_9&!0=s)32sn3tn&p1#3(817-mhpi0%y2&j$whz#k%+g'
 DEBUG = True
 
 #Use port 8000
-ALLOWED_HOSTS = ['127.0.0.1', 'something.pythonanywhere.com', '192.168.0.19', '192.168.40.8']
+ALLOWED_HOSTS = ['127.0.0.1', 'something.pythonanywhere.com', '192.168.0.19', '192.168.40.51']
 
 
 # Application definition

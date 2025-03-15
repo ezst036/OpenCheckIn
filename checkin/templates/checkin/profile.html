@@ -135,6 +135,8 @@
                                                                 </a>
                                                             </td>
                                                             <td class="youthfn youthData" name="youth_first_name">{{youth.youth_first_name}}</td>
+                                                            <td style="display:none" class="youthmn youthData" name="youth_middle_name">{{youth.youth_middle_name}}</td>
+                                                            <td style="display:none" class="youthln youthData" name="youth_last_name">{{youth.youth_last_name}}</td>
 
                                                             <form id="precheckYouth" action="">
                                                                 <td align="center">
@@ -153,9 +155,6 @@
                                                             <td align="center">
                                                                 <div class="form-group">
                                                                     <button class="btn btn-outline-info form-control" id="editTblBtn-{{youth.id}}" onClick="editYouth('{{ youth.id }}',
-                                                                                                                                        '{{ youth.youth_first_name }}',
-                                                                                                                                        '{{ youth.youth_middle_name }}',
-                                                                                                                                        '{{ youth.youth_last_name }}',
                                                                                                                                         '{{ youth.image }}')"
                                                                                                                                         data-toggle="modal" data-target="#youthModal">EDIT</button>
                                                                 </div>
@@ -415,7 +414,9 @@ function appendToYouthTable(youth) {
             </a>
         </td>
 
-        <td class="youthfn" name="youth_first_name">${youth.youth_first_name}</td>
+        <td class="youthfn youthData" name="youth_first_name">${youth.youth_first_name}</td>
+        <td style="display:none" class="youthmn youthData" name="youth_middle_name">${youth.youth_middle_name}</td>
+        <td style="display:none" class="youthln youthData" name="youth_last_name">${youth.youth_last_name}</td>
 
         <form id="precheckYouth" action="">
             <td align="center">
@@ -423,9 +424,9 @@ function appendToYouthTable(youth) {
                     <input type="checkbox" name="pre_check" class="youthcb youthData" style="display:none" {% if youth.pre_check %}checked{% endif %} />
 
                     {% if youth.pre_check %}
-                        <button class="btn btn-outline-success form-control" onClick="checkinYouth({{youth.id}})">Checkout</button>
+                        <button class="btn btn-outline-success form-control" onClick="checkinYouth(${youth.id})">Checkout</button>
                     {% else %}
-                        <button class="btn btn-success form-control" onClick="checkinYouth({{youth.id}})">Checkin</button>
+                        <button class="btn btn-success form-control" onClick="checkinYouth(${youth.id})">Checkin</button>
                     {% endif %}
                 </div>
             </td>
@@ -433,18 +434,12 @@ function appendToYouthTable(youth) {
 
         <td align="center">
             <div class="form-group">
-                <!-- Button hidden for now.  Edit doesn't return data with a new button. -->
-                <button class="btn btn-outline-info form-control" onClick="editYouth('{{ youth.id }}',
-                                                                        '{{ youth.youth_first_name }}',
-                                                                        '{{ youth.youth_middle_name }}',
-                                                                        '{{ youth.youth_last_name }}',
-                                                                        '{{ youth.image }}')"
-                                                                        data-toggle="modal" style="display:none" data-target="#youthModal")">EDIT</button>
-                <button class="btn btn-outline-info form-control" data-toggle="modal" onClick="window.location.reload();">Refresh</button>
+                <button class="btn btn-outline-info form-control" id="editTblBtn-${ youth.id }" onClick="editYouth('${ youth.id }', '${ youth.image }')"
+                                                                        data-toggle="modal" data-target="#youthModal">EDIT</button>
             </div>
         </td>
         <td align="center">
-            <button class="btn btn-outline-danger form-control" onClick="deleteYouth({{youth.id}})">DELETE</button>
+            <button class="btn btn-outline-danger form-control" onClick="deleteYouth(${youth.id})">DELETE</button>
         </td>
     </tr>`);
 }
@@ -543,7 +538,7 @@ function homeLocation() {
     });
 }
 
-function editYouth(id, fn, mn, ln, img) {
+function editYouth(id, img) {
     var btnName = document.getElementById('editTblBtn-' + id);
     btnName.innerHTML = "Uploading....";
     btnName.classList.remove("btn-outline-info");
@@ -551,9 +546,9 @@ function editYouth(id, fn, mn, ln, img) {
     //btnName.disabled = true;
     if (id) {
         $('#form-youthid').val(id);
-        $('#form-youthf').val(fn);
-        $('#form-youthm').val(mn);
-        $('#form-youthl').val(ln);
+        $('#form-youthf').val($('#youth-' + id).find('.youthfn').text());
+        $('#form-youthm').val($('#youth-' + id).find('.youthmn').text());
+        $('#form-youthl').val($('#youth-' + id).find('.youthln').text());
         $('#form-youthimg').val(img);
         var idInput = $('input[name="formYouthId"]').val().trim();
         console.log(idInput);
