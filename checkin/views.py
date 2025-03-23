@@ -263,7 +263,10 @@ class createQR(View):
         familyids = Family.objects.filter(guardian_id=request.user.id).values_list('youth_id', flat=True)
 
         #Get all children who have been either checked in by a parent or by an employee
-        filtered = list(Youth.objects.filter(id__in=familyids).filter(pre_check=1, is_checked_in=1).values_list('id', flat=True))
+        #filtered = list(Youth.objects.filter(id__in=familyids).filter(pre_check=1, is_checked_in=1).values_list('id', flat=True))
+        
+        #Get all children who have been checked in by a parent
+        filtered = list(Youth.objects.filter(id__in=familyids).filter(pre_check=1).values_list('id', flat=True))
         
         #Create a basic object to gracefully handle no code created.
         obj = {
