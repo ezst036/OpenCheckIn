@@ -3,7 +3,9 @@ import folium
 from account.models import UIPrefs
 from event.models import Event
 from . models import Mission
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
+@xframe_options_sameorigin
 def index(request):
     try:
         preferences = UIPrefs.objects.all()[0]
