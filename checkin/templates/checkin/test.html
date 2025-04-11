@@ -54,7 +54,15 @@
                         <div class="container" id="map"></div>
                     </div>
                 {% endif %}
-            </div>
+            </div>            
+
+            <textarea readonly style="height: 200px; width: 900px;">
+                <div>
+                    <iframe height="650" width="1024" src="https://ezst036.pythonanywhere.com/fullscreenmap/"></iframe>
+                </div>
+            </textarea>
+            
+            <br /> <br /><br /> <br />
 
             <script>
                 var map = L.map('map').setView([{{preferences.latitude}}, {{preferences.longitude}}], 13);
