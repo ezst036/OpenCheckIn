@@ -11,9 +11,9 @@ Many aspects of Open Check In have requirements that are set and I cannot change
 
 [**How to deploy to Python Anywhere**](https://www.youtube.com/watch?v=E5zA6UqCwZ0)
 
-In this video we will make a copy of Open Check In and make a proper configuration so that your secure copy can be accessed from any place.
+In this video we will make a copy of Open Check In and make a proper configuration so that your secure copy can be accessed in the cloud from any place.
 
-Deploying your own copy of Open Check In to the cloud has the appearance of being way more challenging than it actually is.  Feel free to send me a message for help.
+Deploying your own copy of Open Check In has the appearance of being way more challenging than it actually is.  Feel free to send me a message for help.
 
 [**How to create new users**](https://www.youtube.com/watch?v=KqjULRvxC-c)
 
