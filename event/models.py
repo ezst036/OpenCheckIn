@@ -1,12 +1,22 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.timezone import now
+
+missionType = [
+    ('new', 'New'),
+    ('planned', 'Planned'),
+    ('current', 'Current'),
+    ('complete', 'Complete'),
+    ('supported', 'Supported'),
+]
 
 class Event(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200, db_index=True, null=True)
     image = models.ImageField(upload_to='events/%Y/%m/%d', blank=True)
     description = models.TextField(blank=True)
-    dateofevent = models.DateField(auto_now=True)
+    startdate = models.DateField(default=now)
+    enddate = models.DateField(default=now)
     price = models.IntegerField(default=0)
     complete = models.BooleanField(default=False)
     nocost = models.BooleanField(default=False)
@@ -14,6 +24,8 @@ class Event(models.Model):
     longitude = models.FloatField(default=0)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True)
+    ismission = models.BooleanField(default=False)
+    type = models.CharField(verbose_name="Mission type", max_length=24, choices=missionType, default='new')
     
     def __str__(self):
         return self.name
