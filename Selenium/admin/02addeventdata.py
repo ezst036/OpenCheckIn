@@ -15,10 +15,6 @@ driver.get(url)
 
 time.sleep(3)
 
-'''
-Admin user log in and add the permissions.
-'''
-
 loginlink = driver.find_element(By.LINK_TEXT, "Login")
 loginhover = ActionChains(driver).move_to_element(loginlink)
 loginhover.perform()
