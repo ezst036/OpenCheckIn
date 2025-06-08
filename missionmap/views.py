@@ -2,6 +2,7 @@ from django.shortcuts import render
 import folium
 from account.models import UIPrefs
 from event.models import Event
+from missionmap.models import MapPointPrefs
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 @xframe_options_exempt
@@ -48,6 +49,18 @@ def index(request):
     #                     popup=mpopup).add_to(ourmap)
     
     events = Event.objects.all()
+    colorprefs = MapPointPrefs.objects.all()
+    
+    if len(colorprefs) == 0:
+        #create a simple preference object automatically
+        MapPointPrefs.objects.create(
+            newPointColor = 'pink', newMissionIcon = 'fa-bars', newIconColor = 'white',
+            plannedPointColor = 'lightgray', plannedMissionIcon = 'fa-bars', plannedIconColor = 'white',
+            currentPointColor = 'red', currentMissionIcon = 'fa-bars', currentIconColor = 'white',
+            completePointColor = 'orange', completeMissionIcon = 'fa-bars', completeIconColor = 'white',
+            supportedPointColor = 'purple', supportedMissionIcon = 'fa-bars', supportedIconColor = 'white',
+        )
+        colorprefs = MapPointPrefs.objects.all() #load new obj for use
 
     if len(events) > 0:
         for event in events:
@@ -60,19 +73,19 @@ def index(request):
                 #FontAwesome icons are configurable, find icons at fontawesome.com
                 if event.type == "new":
                     etooltip = "New hover message"
-                    eicon = folium.Icon(color='pink', icon='fa-cloud', icon_color='white', prefix='fa')
+                    eicon = folium.Icon(color=colorprefs[0].newPointColor, icon=colorprefs[0].newMissionIcon, icon_color=colorprefs[0].newIconColor, prefix='fa')
                 if event.type == "planned":
                     etooltip = "Planned hover message"
-                    eicon = folium.Icon(color='lightgray', icon='fa-cloud', icon_color='lightblue', prefix='fa')
+                    eicon = folium.Icon(color=colorprefs[0].plannedPointColor, icon=colorprefs[0].plannedMissionIcon, icon_color=colorprefs[0].plannedIconColor, prefix='fa')
                 if event.type == "current":
                     etooltip = "Current hover message"
-                    eicon = folium.Icon(color='red', icon='fa-circle-dot', icon_color='white', prefix='fa')
+                    eicon = folium.Icon(color=colorprefs[0].currentPointColor, icon=colorprefs[0].currentMissionIcon, icon_color=colorprefs[0].currentIconColor, prefix='fa')
                 if event.type == "complete":
                     etooltip = "Complete hover message"
-                    eicon = folium.Icon(color='orange', icon='fa-border-none', icon_color='orange', prefix='fa')
+                    eicon = folium.Icon(color=colorprefs[0].completePointColor, icon=colorprefs[0].completeMissionIcon, icon_color=colorprefs[0].completeIconColor, prefix='fa')
                 if event.type == "supported":
                     etooltip = "Supported hover message"
-                    eicon = folium.Icon(color='purple', icon='fa-bell', icon_color='white', prefix='fa')
+                    eicon = folium.Icon(color=colorprefs[0].supportedPointColor, icon=colorprefs[0].supportedMissionIcon, icon_color=colorprefs[0].supportedIconColor, prefix='fa')
 
                 #Add the marker after it is configured.
                 folium.Marker(ecoordinates,
