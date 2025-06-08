@@ -7,7 +7,7 @@ In most instances Open Check In will be deployed to an online provider, such as 
 
 Many aspects of Open Check In have requirements that are set and I cannot change them, because I either did not program the plug-in or I do not control the servers.
 
-## Training and use videos
+## Training, use, and configuration videos
 
 [**How to deploy to Python Anywhere**](https://www.youtube.com/watch?v=E5zA6UqCwZ0)
 
@@ -15,13 +15,13 @@ In this video we will make a copy of Open Check In and make a proper configurati
 
 Deploying your own copy of Open Check In has the appearance of being way more challenging than it actually is.  Feel free to send me a message for help.
 
-[**How to create new users**](https://www.youtube.com/watch?v=KqjULRvxC-c)
+[**How a user can register as a new user to create a profile**](https://www.youtube.com/watch?v=KqjULRvxC-c)
 
-[**How to login and logout**](https://www.youtube.com/watch?v=BAVa1Rc7NIM)
+[**How a user can login and logout**](https://www.youtube.com/watch?v=BAVa1Rc7NIM)
 
-[**How to update a user profile**](https://www.youtube.com/watch?v=BNMXmS_9_i0)
+[**How a user can update their user profile**](https://www.youtube.com/watch?v=BNMXmS_9_i0)
 
-[**How parents add youth to their profile**](https://www.youtube.com/watch?v=_sLpDqGzGzw)
+[**How parents add children to their profile**](https://www.youtube.com/watch?v=_sLpDqGzGzw)
 
 [**Admin permission management**](https://www.youtube.com/watch?v=v50rNrX4tIM)
 
@@ -29,17 +29,23 @@ Admins can set full, partial, or specific permissions to users, volunteers, or s
 
 [**How staff can check in children on Sunday**](https://www.youtube.com/watch?v=XKNxWtdvoS4)
 
-[**How to add a church event**](https://www.youtube.com/watch?v=UR6oH_RmtoE)
+[**How admins can add a church event**](https://www.youtube.com/watch?v=UR6oH_RmtoE)
 
 Church events could be anything from VBS to Bible study groups and more.
 
 Adding products such as coffee and snacks is a similar process.
 
-[**How to sign up for events**](https://www.youtube.com/watch?v=WdIQoheiut8)
+[**How admins can add a mission trip**](https://www.youtube.com/watch?v=VEAyTRKfP68)
+
+A mission trip is handled similarly to other events, where users may sign up for them or other information can be given.
+
+[**How a user can sign up for events**](https://www.youtube.com/watch?v=WdIQoheiut8)
 
 [**How to help a user do a password reset**](https://www.youtube.com/watch?v=Vde1Pypd5Kc)
 
-[**How to check-out after service with a QR code**](https://www.youtube.com/watch?v=aMPeqfaz8ME)
+[**How a user can check-out children after service with a QR code**](https://www.youtube.com/watch?v=aMPeqfaz8ME)
+
+[**How an admin can change the title screen in configuration**](https://www.youtube.com/watch?v=fbeX-kwzaQs)
 
 [**How to broadcast over wifi locally**](https://www.youtube.com/watch?v=He1H5t6DZao)
 
