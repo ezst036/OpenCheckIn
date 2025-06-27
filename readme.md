@@ -1,5 +1,5 @@
 # Welcome!
-For assistance, additional training video requests or reporting of an issue please create an issue for tracking and discussion purposes.
+For assistance, additional training video requests or reporting of a defect please create an issue for tracking and discussion purposes.
 
 ## About
 Open Check In is free, open source, and customizeable church management software that can be deployed to the cloud. Among the more notable features are independent user profiles for parents of children during Sunday service, adding points to a map to display missions, the ability to handle payments for events and products, making requests for prayer to church staff, and the ability to set different permission levels for areas within a church.
