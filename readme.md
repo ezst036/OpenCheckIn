@@ -2,12 +2,12 @@
 For assistance, additional training video requests or reporting of a defect please create an issue for tracking and discussion purposes.
 
 ## About
-Open Check In is free, open source, and customizeable church management software that can be deployed to the cloud or managed locally through wifi. Among the more notable features are independent user profiles for parents of children during Sunday service, adding points to a map to display missions, the ability to handle payments for events and products, making requests for prayer to church staff, and the ability to set different permission levels for staff access to areas within a church sa represented in Open Check In.
+Open Check In is free, open source, and customizeable church management software that can be deployed to the cloud or managed locally through wifi. Among the more notable features are independent user profiles for parents of children during Sunday service, adding points to a map to display missions, the ability to handle payments for events and products, making requests for prayer to church staff, and the ability to set different permission levels for staff access to areas within a church as represented in Open Check In.
 
 # Documentation
 ## Getting started
 
-In most instances Open Check In will be deployed to an online provider, such as Python Anywhere.  But it is possible to set up a small server and broadcast within your own Wifi and be run entirely for free.
+In most instances Open Check In will be deployed to an online provider, such as Python Anywhere.  But it is possible to set up a small server and broadcast within your own wifi and be run entirely for free.
 
 Many aspects of Open Check In have requirements that are set and I cannot change them, because I either did not program the plug-in or I do not control the servers.
 
@@ -61,6 +61,6 @@ Python Anywhere seems to be reasonably priced compared to most others, however O
 
 [**How to setup Porteus Kiosk to point to Open Check In**](https://www.youtube.com/watch?v=ROiHfk1OfSI)
 
-For this last how to video, I showed Open Check In configured for boot on the free and open source Porteus Kiosk.
+For this last how-to video, I showed Open Check In configured for boot on the free and open source Porteus Kiosk.
 
 I have a lot of instructions for each category of information based on what it is that you would like to do, please click on the corresponding video for more information and a brief view of how to proceed in that category.
