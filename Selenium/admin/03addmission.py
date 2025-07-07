@@ -88,6 +88,10 @@ eventupdnocost = driver.find_element(By.ID, "id_nocost").click()
 
 time.sleep(2)
 
+eventismission = driver.find_element(By.ID, "id_ismission").click()
+
+time.sleep(2)
+
 savelink = driver.find_element(By.NAME, "_save")
 savehover = ActionChains(driver).move_to_element(savelink)
 savehover.perform()
