@@ -5,10 +5,19 @@ missionColor = [
     ('pink', 'Pink'),
     ('lightgray', 'Light Gray'),
     ('red', 'Red'),
+    ('lightred', 'Light Red'),
+    ('darkred', 'Dark Red'),
     ('orange', 'Orange'),
     ('purple', 'Purple'),
+    ('darkpurple', 'Dark Purple'),
     ('blue', 'Blue'),
+    ('darkblue', 'Dark Blue'),
+    ('lightblue', 'Light Blue'),
     ('green', 'Green'),
+    ('darkgreen', 'Dark Green'),
+    ('lightgreen', 'Light Green'),
+    ('gray', 'Gray'),
+    ('green', 'Black'),
 ]
 
 class MapPointPrefs(models.Model):

@@ -8,9 +8,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 @xframe_options_exempt
 def index(request):
     try:
-        preferences = UIPrefs.objects.all()[0]
+        basepref = UIPrefs.objects.all()[0]
     except Exception as e:
-        preferences = {
+        basepref = {
             'latitude': '25.036289',
             'longitude': '-77.481326',
             'church_name': 'invalid',
@@ -19,21 +19,23 @@ def index(request):
         }
         print(e)
     
-    ourmap = folium.Map(location=[preferences.latitude, preferences.longitude], zoom_start=9)
+    ourmap = folium.Map(location=[basepref.latitude, basepref.longitude], zoom_start=9)
 
-    #Add home church location
-    homeCoords = (preferences.latitude, preferences.longitude)
-    hometooltip = "This is home"
-    homeicon = folium.Icon(color='green', icon='fa-bars', icon_color='white', prefix='fa')
-    homeframe = folium.IFrame('Home: ' + preferences.church_name +
-                              ' <a href=https://www.bible.com/>Bible.com</a> <br />' +
-                              preferences.church_address + '<br />' +
-                              preferences.church_phone)
-    homepopup = folium.Popup(homeframe, min_width=300, max_width=300)
-    folium.Marker(homeCoords,
-                  tooltip=hometooltip,
-                  icon=homeicon,
-                  popup=homepopup).add_to(ourmap)
+    preferences = UIPrefs.objects.all()
+    for pref in preferences:
+        #Add church locations
+        homeCoords = (pref.latitude, pref.longitude)
+        hometooltip = "This is home"
+        homeicon = folium.Icon(color='green', icon='fa-bars', icon_color='white', prefix='fa')
+        homeframe = folium.IFrame(pref.church_name +
+                                ' <a href=https://www.bible.com/>Bible.com</a> <br />' +
+                                pref.church_address + '<br />' +
+                                pref.church_phone)
+        homepopup = folium.Popup(homeframe, min_width=300, max_width=300)
+        folium.Marker(homeCoords,
+                    tooltip=hometooltip,
+                    icon=homeicon,
+                    popup=homepopup).add_to(ourmap)
 
     # if len(missions) > 0:
     #     for mission in missions:
