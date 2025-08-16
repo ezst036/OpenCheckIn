@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 import re
 from django.utils.timezone import now
 import stripe
@@ -7,6 +7,18 @@ from account.models import UIPrefs
 from . models import TitheLog, StripeKeys
 
 def index(request):
+    try: #Always return the first available
+        preferences = UIPrefs.objects.all().first()
+    except Exception as e:
+        #Deleted preferences
+        print(e)
+
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if preferences is None:
+        return redirect('home')
+    elif not preferences.tithe:
+        return redirect('home')
+
     #Always return the first available
     apikeys = StripeKeys.objects.all().first()
 

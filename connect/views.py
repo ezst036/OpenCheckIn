@@ -6,6 +6,18 @@ from django.contrib import messages
 from twilio.rest import Client
 
 def connectview(request):
+    try: #Always return the first available
+        preferences = UIPrefs.objects.all().first()
+    except Exception as e:
+        #Deleted preferences
+        print(e)
+
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if preferences is None:
+        return redirect('home')
+    elif not preferences.connect:
+        return redirect('home')
+
     if request.method == 'GET':
         #Pre-populate user information in the new form
         if request.user.is_authenticated:

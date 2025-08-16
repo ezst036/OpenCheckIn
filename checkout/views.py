@@ -70,10 +70,17 @@ def cartdetails(request):
     return render(request, 'checkout/shoppingcart.html', context)
 
 def productlist(request, categoryslug=None):
-    try:
+    try: #Always return the first available
         preferences = UIPrefs.objects.all().first()
     except Exception as e:
+        #Deleted preferences
         print(e)
+
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if preferences is None:
+        return redirect('home')
+    elif not preferences.store:
+        return redirect('home')
 
     category = None
     categories = Category.objects.all()

@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 import stripe
 from account.models import UIPrefs
 from . models import Event, StripeKeys, EventPurchaseLog
@@ -129,10 +129,17 @@ def chargeEvent(request):
         return render(request, 'event/charge.html', {'eventconfirmation':eventuuid, 'event':event})
 
 def eventlist(request):
-    try:
+    try: #Always return the first available
         preferences = UIPrefs.objects.all().first()
     except Exception as e:
+        #Deleted preferences
         print(e)
+
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if preferences is None:
+        return redirect('home')
+    elif not preferences.events:
+        return redirect('home')
 
     context = {
         'preferences': preferences,

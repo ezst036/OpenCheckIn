@@ -12,8 +12,10 @@ def registration_view(request):
         #Deleted preferences
         print(e)
 
-    #If registration is closed, return to the homepage.
-    if not preferences.open_registration:
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if preferences is None:
+        return redirect('home')
+    elif not preferences.open_registration:
         return redirect('home')
 
     if request.POST:

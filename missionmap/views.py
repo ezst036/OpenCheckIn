@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 import folium
 from account.models import UIPrefs
 from event.models import Event
@@ -18,7 +18,13 @@ def index(request):
             'church_phone': 'invalid'
         }
         print(e)
-    
+
+    #If registration is closed, return to the homepage or if a database does not exist yet
+    if basepref is None:
+        return redirect('home')
+    elif not basepref.map:
+        return redirect('home')
+
     ourmap = folium.Map(location=[basepref.latitude, basepref.longitude], zoom_start=9)
 
     preferences = UIPrefs.objects.all()
