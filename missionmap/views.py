@@ -25,24 +25,60 @@ def index(request):
     elif not basepref.map:
         return redirect('home')
 
-    ourmap = folium.Map(location=[basepref.latitude, basepref.longitude], zoom_start=9)
-
+    events = Event.objects.all()
+    colorprefs = MapPointPrefs.objects.all()
     preferences = UIPrefs.objects.all()
-    for pref in preferences:
-        #Add church locations
-        homeCoords = (pref.latitude, pref.longitude)
-        hometooltip = "This is home"
-        homeicon = folium.Icon(color='green', icon='fa-bars', icon_color='white', prefix='fa')
-        homeframe = folium.IFrame(pref.church_name +
-                                ' <a href=https://www.bible.com/>Bible.com</a> <br />' +
-                                pref.church_address + '<br />' +
-                                pref.church_phone)
-        homepopup = folium.Popup(homeframe, min_width=300, max_width=300)
-        folium.Marker(homeCoords,
-                    tooltip=hometooltip,
-                    icon=homeicon,
-                    popup=homepopup).add_to(ourmap)
+    ourmap = folium.Map(location=[basepref.latitude, basepref.longitude], zoom_start=9, height='100%')
 
+    if len(colorprefs) == 0:
+        #create a simple preference object automatically
+        MapPointPrefs.objects.create(
+            newPointColor = 'pink', newMissionIcon = 'fa-bars', newIconColor = 'white',
+            plannedPointColor = 'lightgray', plannedMissionIcon = 'fa-bars', plannedIconColor = 'white',
+            currentPointColor = 'red', currentMissionIcon = 'fa-bars', currentIconColor = 'white',
+            completePointColor = 'orange', completeMissionIcon = 'fa-bars', completeIconColor = 'white',
+            supportedPointColor = 'purple', supportedMissionIcon = 'fa-bars', supportedIconColor = 'white',
+            mainCampusPointColor = 'green', mainCampusIcon = 'fa-bars', mainCampusIconColor = 'white',
+            secondaryCampusPointColor = 'lightgreen', secondaryCampusIcon = 'fa-bars', secondaryCampusIconColor = 'white'
+        )
+        colorprefs = MapPointPrefs.objects.all() #load new obj for use
+
+    prefCounter = 0
+    for pref in preferences:
+        if prefCounter == 0:
+            prefCounter += 1
+
+            #Add main church location
+            homeCoords = (pref.latitude, pref.longitude)
+            hometooltip = "This is home"
+            homeicon = folium.Icon(color=colorprefs[0].mainCampusPointColor, icon=colorprefs[0].mainCampusIcon, icon_color=colorprefs[0].mainCampusIconColor, prefix='fa')
+            homeframe = folium.IFrame(pref.church_name +
+                                    ' <a href=https://www.bible.com/>Bible.com</a> <br />' +
+                                    pref.church_address + '<br />' +
+                                    pref.church_phone)
+            homepopup = folium.Popup(homeframe, min_width=300, max_width=300)
+            folium.Marker(homeCoords,
+                        tooltip=hometooltip,
+                        icon=homeicon,
+                        popup=homepopup).add_to(ourmap)
+            
+        else:
+            prefCounter += 1
+
+            #Add additional campus locations
+            homeCoords = (pref.latitude, pref.longitude)
+            hometooltip = "This is home"
+            homeicon = folium.Icon(color=colorprefs[0].secondaryCampusPointColor, icon=colorprefs[0].secondaryCampusIcon, icon_color=colorprefs[0].secondaryCampusIconColor, prefix='fa')
+            homeframe = folium.IFrame(pref.church_name +
+                                    ' <a href=https://www.bible.com/>Bible.com</a> <br />' +
+                                    pref.church_address + '<br />' +
+                                    pref.church_phone)
+            homepopup = folium.Popup(homeframe, min_width=300, max_width=300)
+            folium.Marker(homeCoords,
+                        tooltip=hometooltip,
+                        icon=homeicon,
+                        popup=homepopup).add_to(ourmap)
+    
     # if len(missions) > 0:
     #     for mission in missions:
     #         mcoordinates = (mission.latitude, mission.longitude)
@@ -56,20 +92,6 @@ def index(request):
     #                     icon=micon,
     #                     popup=mpopup).add_to(ourmap)
     
-    events = Event.objects.all()
-    colorprefs = MapPointPrefs.objects.all()
-    
-    if len(colorprefs) == 0:
-        #create a simple preference object automatically
-        MapPointPrefs.objects.create(
-            newPointColor = 'pink', newMissionIcon = 'fa-bars', newIconColor = 'white',
-            plannedPointColor = 'lightgray', plannedMissionIcon = 'fa-bars', plannedIconColor = 'white',
-            currentPointColor = 'red', currentMissionIcon = 'fa-bars', currentIconColor = 'white',
-            completePointColor = 'orange', completeMissionIcon = 'fa-bars', completeIconColor = 'white',
-            supportedPointColor = 'purple', supportedMissionIcon = 'fa-bars', supportedIconColor = 'white',
-        )
-        colorprefs = MapPointPrefs.objects.all() #load new obj for use
-
     if len(events) > 0:
         for event in events:
             if event.ismission == True:
@@ -111,7 +133,7 @@ def index(request):
                             tooltip=etooltip,
                             icon=eicon,
                             popup=epopup).add_to(ourmap)
-    
+
     if request.path == '/fullscreenmap/':
         #Fullscreen does not inherit from the base, otherwise it is the same
         return render(request, 'missionmap/fullscreen.html', { 'map': ourmap._repr_html_() })
