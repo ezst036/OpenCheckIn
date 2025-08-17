@@ -30,7 +30,6 @@ def login(request):
     return render(request, 'checkin/login.html')
 
 def home_screen_view(request):
-
     try:
         preferred = UIPrefs.objects.all()[0]
     except IndexError:
